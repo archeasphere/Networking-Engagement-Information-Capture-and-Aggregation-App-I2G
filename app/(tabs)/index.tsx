@@ -1,74 +1,194 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { StyleSheet, FlatList, TouchableOpacity, View, TextInput } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import Checkbox from 'expo-checkbox';
+import TagModal from './TagModal';
+import LoginScreen from './login';
+import SidebarContent from './SidebarContent'; // Import SidebarContent
+import { setBackgroundColorAsync } from 'expo-system-ui';
+import { Colors } from '@/constants/Colors';
 
-export default function HomeScreen() {
+const Drawer = createDrawerNavigator();
+
+const initialFiles = [
+  { id: '1', name: 'Project Docs.pdf', timestamp: new Date('2025-02-19T00:00:00Z').toUTCString(), icon: 'document-text-outline' },
+  { id: '2', name: 'Design Mockups.png', timestamp: new Date('2025-02-18T00:00:00Z').toUTCString(), icon: 'image-outline' },
+  { id: '3', name: 'App Code.zip', timestamp: new Date('2025-02-15T00:00:00Z').toUTCString(), icon: 'file-tray-outline' },
+  { id: '4', name: 'Meeting Notes.txt', timestamp: new Date('2025-02-10T00:00:00Z').toUTCString(), icon: 'document-outline' },
+];
+
+function HomeScreen({ navigation }) {
+  const [isGridView, setIsGridView] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [files, setFiles] = useState(initialFiles);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newTagName, setNewTagName] = useState('');
+
+  const filteredFiles = files.filter((file) =>
+    file.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleSelection = (id) => {
+    setSelectedFiles((prev) =>
+      prev.includes(id) ? prev.filter((fileId) => fileId !== id) : [...prev, id]
+    );
+  };
+
+  const confirmCreateTag = () => {
+    if (selectedFiles.length > 0 && newTagName.trim()) {
+      const newTag = {
+        id: Date.now().toString(),
+        name: newTagName,
+        timestamp: new Date().toLocaleDateString(),
+        icon: 'pricetag-outline',
+      };
+      setFiles((prevFiles) => [...prevFiles, newTag]);
+      setSelectedFiles([]);
+      setModalVisible(false);
+      setNewTagName('');
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <ThemedView style={styles.container}>
+      <View style={styles.searchBar}>
+        <Ionicons name="search-outline" size={20} color="#B0B0B0" />
+        <TextInput
+          placeholder="Search files..."
+          placeholderTextColor="#B0B0B0"
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+      
+      <View style={styles.header}>
+        <ThemedText style={styles.titleText}>My Files</ThemedText>
+        <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
+          <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
+        </TouchableOpacity>
+      </View>
+
+      {selectedFiles.length > 0 && (
+        <TouchableOpacity style={styles.tagButton} onPress={() => setModalVisible(true)}>
+          <Ionicons name="pricetag-outline" size={20} color="#FFFFFF" />
+          <ThemedText> Create Label</ThemedText>
+        </TouchableOpacity>
+      )}
+      
+      <FlatList
+        data={filteredFiles}
+        key={isGridView ? 'grid' : 'list'}
+        numColumns={isGridView ? 2 : 1}
+        renderItem={({ item }) => (
+          <View style={[isGridView ? styles.gridItem : styles.rowItem]}>
+            <Checkbox
+              value={selectedFiles.includes(item.id)}
+              onValueChange={() => toggleSelection(item.id)}
+              color={selectedFiles.includes(item.id) ? '#5A42F5' : undefined}
+            />
+            <Ionicons name={item.icon} size={28} color="#4C8CFF" style={styles.fileIcon} />
+            <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>{item.name}</ThemedText>
+            {!isGridView && <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>}
+            {isGridView && <View style={styles.thumbnail} />}
+            {isGridView && <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>}
+            <Ionicons name="ellipsis-vertical" size={20} color="#FFFFFF" style={styles.menuIcon} />
+          </View>
+        )}
+        keyExtractor={(item) => item.id}
+      />
+      
+      <TagModal
+        visible={modalVisible}
+        TagName={newTagName}
+        onChangeTagName={setNewTagName}
+        onCancel={() => setModalVisible(false)}
+        onConfirm={confirmCreateTag}
+      />
+    </ThemedView>
   );
 }
 
+export default function AppNavigator() {
+  return (
+    <Drawer.Navigator 
+      drawerContent={(props) => <SidebarContent {...props} />} 
+      screenOptions={{
+        drawerStyle: { backgroundColor: '#FFFFFF' },
+        drawerLabelStyle: { color: '#000000' },
+        headerStyle: { backgroundColor: '#FFFFFF' },
+        headerTitleStyle: { color: '#000000' },
+        headerTintColor: '#000000', // Ensures top-left icon is black
+      }}
+    > 
+      <Drawer.Screen name="Home" component={HomeScreen} />
+    </Drawer.Navigator>
+  );
+}
+
+
+
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1, backgroundColor: '#FFFFFF', padding: 16 },
+  searchBar: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#F0F0F0', 
+    padding: 10, 
+    borderRadius: 10, 
+    marginBottom: 12 
   },
-  stepContainer: {
-    gap: 8,
+  searchInput: { flex: 1, color: '#000000', marginLeft: 10 },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginBottom: 12 
+  },
+  titleText: { 
+    color: '#333333', // Darker gray for better contrast in light mode
+    fontSize: 24, 
+    fontWeight: 'bold' 
+  },  
+  tagButton: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#3A6FF7', 
+    padding: 12, 
+    borderRadius: 8, 
+    justifyContent: 'center', 
+    marginBottom: 12 
+  },
+  rowItem: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 10, 
+    backgroundColor: '#F8F8F8', 
+    borderRadius: 10, 
     marginBottom: 8,
+    borderWidth: 1, 
+    borderColor: '#E0E0E0' 
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  gridItem: { 
+    alignItems: 'center', 
+    backgroundColor: '#F8F8F8', 
+    borderRadius: 10, 
+    padding: 16, 
+    margin: 8, 
+    flexBasis: '48%',
+    borderWidth: 1, 
+    borderColor: '#E0E0E0' 
   },
+  fileIcon: { marginHorizontal: 10, color: '#4C8CFF' },
+  fileName: { flex: 1, color: '#000000' },
+  timestamp: { color: '#606060', fontSize: 12 },
+  menuIcon: { marginLeft: 10, color: '#000000' },
+  thumbnail: { width: 60, height: 60, backgroundColor: '#D1D1F7', marginTop: 8 },
+  sidebar: { flex: 1, backgroundColor: '#F8F8F8', padding: 20 },
 });
+

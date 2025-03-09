@@ -30,9 +30,12 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerTintColor: '#000000',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
+
       <Tabs.Screen
         name="explore"
         options={{
