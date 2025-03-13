@@ -1,48 +1,49 @@
-import { Tabs } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
+import { View, Text, StyleSheet } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import SidebarContent from './SidebarContent';
 
-export default function TabLayout() {
+export default function DrawerLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
+    <Drawer
+      drawerContent={(props) => <SidebarContent {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+        headerStyle: { 
+          backgroundColor: Colors[colorScheme ?? 'light'].background 
+        },
+        headerTintColor: Colors[colorScheme ?? 'light'].text,
+        drawerActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        drawerInactiveTintColor: Colors[colorScheme ?? 'light'].text,
+        drawerType: 'front',
       }}>
-      <Tabs.Screen
+      <Drawer.Screen
         name="index"
         options={{
           title: 'Home',
-          headerStyle: { backgroundColor: '#FFFFFF' },
-          headerTintColor: '#000000',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
         }}
       />
 
-      <Tabs.Screen
+      <Drawer.Screen
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="paperplane.fill" color={color} />,
         }}
       />
-    </Tabs>
+
+      <Drawer.Screen
+        name="graphView"
+        options={{
+          title: "File-Label Graph",
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="network" color={color} />,
+        }}
+      />
+    </Drawer>
   );
 }
