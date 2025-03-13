@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
@@ -36,3 +37,14 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+=======
+# Ignore environment variables
+.env
+firebaseServiceAccount.json
+# Ignore node_modules folder
+node_modules/
+# Ignore npm logs and cache files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+>>>>>>> 6e3890f (Added .gitignore to exclude sensitive files)
