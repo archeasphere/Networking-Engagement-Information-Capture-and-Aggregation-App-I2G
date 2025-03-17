@@ -1,0 +1,94 @@
+[debug] [2025-03-17T00:15:15.591Z] ----------------------------------------------------------------------
+[debug] [2025-03-17T00:15:15.600Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2025-03-17T00:15:15.602Z] CLI Version:   13.34.0
+[debug] [2025-03-17T00:15:15.602Z] Platform:      win32
+[debug] [2025-03-17T00:15:15.602Z] Node Version:  v22.14.0
+[debug] [2025-03-17T00:15:15.603Z] Time:          Sun Mar 16 2025 17:15:15 GMT-0700 (Pacific Daylight Time)
+[debug] [2025-03-17T00:15:15.603Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-17T00:15:16.170Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-17T00:15:16.171Z] > authorizing via signed-in user (seomin042@gmail.com)
+[info] i  emulators: Starting emulators: functions, extensions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions, extensions"}}
+[debug] [2025-03-17T00:15:16.179Z] Checked if tokens are valid: true, expires at: 1742173925035
+[debug] [2025-03-17T00:15:16.179Z] Checked if tokens are valid: true, expires at: 1742173925035
+[debug] [2025-03-17T00:15:16.182Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/coonectech [none]
+[debug] [2025-03-17T00:15:16.444Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/coonectech 200
+[debug] [2025-03-17T00:15:16.445Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/coonectech {"projectNumber":"312860374786","projectId":"coonectech","lifecycleState":"ACTIVE","name":"coonectech","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-03-09T02:35:29.996689Z"}
+[debug] [2025-03-17T00:15:16.471Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-17T00:15:16.472Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[warn] !  emulators: It seems that you are running multiple instances of the emulator suite for project coonectech. This may result in unexpected behavior. 
+[debug] [2025-03-17T00:15:16.490Z] [hub] writing locator at C:\Users\tasha\AppData\Local\Temp\hub-coonectech.json
+[debug] [2025-03-17T00:15:16.508Z] [Extensions] Started Extensions emulator, this is a noop.
+[debug] [2025-03-17T00:15:16.527Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-17T00:15:16.527Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-17T00:15:16.528Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-17T00:15:16.528Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[debug] [2025-03-17T00:15:16.549Z] defaultcredentials: writing to file C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json
+[debug] [2025-03-17T00:15:16.557Z] Setting GAC to C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\tasha\\AppData\\Roaming\\firebase\\seomin042_gmail_com_application_default_credentials.json"}}
+[debug] [2025-03-17T00:15:16.559Z] Checked if tokens are valid: true, expires at: 1742173925035
+[debug] [2025-03-17T00:15:16.559Z] Checked if tokens are valid: true, expires at: 1742173925035
+[debug] [2025-03-17T00:15:16.560Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/coonectech/adminSdkConfig [none]
+[debug] [2025-03-17T00:15:17.038Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/coonectech/adminSdkConfig 200
+[debug] [2025-03-17T00:15:17.038Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/coonectech/adminSdkConfig {"projectId":"coonectech","storageBucket":"coonectech.firebasestorage.app"}
+[debug] [2025-03-17T00:15:17.118Z] [Extensions] Connecting Extensions emulator, this is a noop.
+[info] i  functions: Watching "C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\" for Cloud Functions..."}}
+[debug] [2025-03-17T00:15:17.147Z] Validating nodejs source
+[debug] [2025-03-17T00:15:19.260Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-03-17T00:15:19.260Z] Building nodejs source
+[debug] [2025-03-17T00:15:19.261Z] Failed to find version of module node: reached end of search path C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\node_modules
+[info] +  functions: Using node@22 from host. 
+[debug] [2025-03-17T00:15:19.269Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-03-17T00:15:19.285Z] Found firebase-functions binary at 'C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8467
+
+[debug] [2025-03-17T00:15:21.174Z] Got response from /__/functions.yaml {"endpoints":{},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2025-03-17T00:15:25.243Z] defaultcredentials: writing to file C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json
+[debug] [2025-03-17T00:15:25.245Z] Setting GAC to C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\tasha\\AppData\\Roaming\\firebase\\seomin042_gmail_com_application_default_credentials.json"}}
+[info] +  functions: Loaded functions definitions from source: . {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: ."}}
+[debug] [2025-03-17T00:15:25.263Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────────────┬──────────────────────────────────┐
+│ Emulator   │ Host:Port      │ View in Emulator UI              │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Functions  │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions  │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Extensions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/extensions │
+└────────────┴────────────────┴──────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+┌─────────────────────────┬───────────────┬─────────────────────┐
+│ Extension Instance Name │ Extension Ref │ View in Emulator UI │
+└─────────────────────────┴───────────────┴─────────────────────┘
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
