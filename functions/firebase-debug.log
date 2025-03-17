@@ -1,0 +1,330 @@
+[debug] [2025-03-13T21:03:38.333Z] ----------------------------------------------------------------------
+[debug] [2025-03-13T21:03:38.338Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2025-03-13T21:03:38.339Z] CLI Version:   13.34.0
+[debug] [2025-03-13T21:03:38.339Z] Platform:      win32
+[debug] [2025-03-13T21:03:38.339Z] Node Version:  v22.14.0
+[debug] [2025-03-13T21:03:38.340Z] Time:          Thu Mar 13 2025 14:03:38 GMT-0700 (Pacific Daylight Time)
+[debug] [2025-03-13T21:03:38.340Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-13T21:03:38.909Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-13T21:03:38.910Z] > authorizing via signed-in user (seomin042@gmail.com)
+[info] i  emulators: Starting emulators: functions, extensions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions, extensions"}}
+[debug] [2025-03-13T21:03:38.918Z] Checked if tokens are valid: false, expires at: 1741900261062
+[debug] [2025-03-13T21:03:38.919Z] Checked if tokens are valid: false, expires at: 1741900261062
+[debug] [2025-03-13T21:03:38.919Z] > refreshing access token with scopes: []
+[debug] [2025-03-13T21:03:38.923Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-03-13T21:03:38.923Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-03-13T21:03:39.090Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-03-13T21:03:39.090Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-03-13T21:03:39.108Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/coonectech [none]
+[debug] [2025-03-13T21:03:39.347Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/coonectech 200
+[debug] [2025-03-13T21:03:39.348Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/coonectech {"projectNumber":"312860374786","projectId":"coonectech","lifecycleState":"ACTIVE","name":"coonectech","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-03-09T02:35:29.996689Z"}
+[debug] [2025-03-13T21:03:39.388Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-13T21:03:39.389Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-03-13T21:03:39.416Z] [hub] writing locator at C:\Users\tasha\AppData\Local\Temp\hub-coonectech.json
+[debug] [2025-03-13T21:03:39.442Z] [Extensions] Started Extensions emulator, this is a noop.
+[debug] [2025-03-13T21:03:39.464Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-13T21:03:39.464Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-13T21:03:39.465Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-13T21:03:39.465Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[debug] [2025-03-13T21:03:39.492Z] defaultcredentials: writing to file C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json
+[debug] [2025-03-13T21:03:39.504Z] Setting GAC to C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\tasha\\AppData\\Roaming\\firebase\\seomin042_gmail_com_application_default_credentials.json"}}
+[debug] [2025-03-13T21:03:39.505Z] Checked if tokens are valid: true, expires at: 1741903418091
+[debug] [2025-03-13T21:03:39.506Z] Checked if tokens are valid: true, expires at: 1741903418091
+[debug] [2025-03-13T21:03:39.506Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/coonectech/adminSdkConfig [none]
+[debug] [2025-03-13T21:03:39.933Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/coonectech/adminSdkConfig 200
+[debug] [2025-03-13T21:03:39.934Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/coonectech/adminSdkConfig {"projectId":"coonectech","storageBucket":"coonectech.firebasestorage.app"}
+[info] i  ui: downloading ui-v1.14.0.zip... {"metadata":{"emulator":{"name":"ui"},"message":"downloading ui-v1.14.0.zip..."}}
+[debug] [2025-03-13T21:03:40.036Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.14.0.zip 
+[debug] [2025-03-13T21:03:40.096Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.14.0.zip 200
+[debug] [2025-03-13T21:03:40.096Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.14.0.zip [stream]
+[debug] [2025-03-13T21:03:40.421Z] Data is 3615311
+[debug] [2025-03-13T21:03:40.422Z] [unzip] Entry: client/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2025-03-13T21:03:40.422Z] [unzip] Processing entry: client\
+[debug] [2025-03-13T21:03:40.422Z] [unzip] mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\
+[debug] [2025-03-13T21:03:40.423Z] [unzip] Entry: client/favicon-16x16.png (compressed_size=293 bytes, uncompressed_size=293 bytes)
+[debug] [2025-03-13T21:03:40.423Z] [unzip] Processing entry: client\favicon-16x16.png
+[debug] [2025-03-13T21:03:40.423Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.424Z] [unzip] Writing file: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\favicon-16x16.png
+[debug] [2025-03-13T21:03:40.425Z] [unzip] Entry: client/safari-pinned-tab.svg (compressed_size=1433 bytes, uncompressed_size=2611 bytes)
+[debug] [2025-03-13T21:03:40.426Z] [unzip] Processing entry: client\safari-pinned-tab.svg
+[debug] [2025-03-13T21:03:40.426Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.426Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\safari-pinned-tab.svg
+[debug] [2025-03-13T21:03:40.434Z] [unzip] Entry: client/favicon.ico (compressed_size=2933 bytes, uncompressed_size=13294 bytes)
+[debug] [2025-03-13T21:03:40.434Z] [unzip] Processing entry: client\favicon.ico
+[debug] [2025-03-13T21:03:40.434Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.435Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\favicon.ico
+[debug] [2025-03-13T21:03:40.437Z] [unzip] Entry: client/index.html (compressed_size=1363 bytes, uncompressed_size=3071 bytes)
+[debug] [2025-03-13T21:03:40.437Z] [unzip] Processing entry: client\index.html
+[debug] [2025-03-13T21:03:40.437Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.438Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\index.html
+[debug] [2025-03-13T21:03:40.439Z] [unzip] Entry: client/android-chrome-192x192.png (compressed_size=2684 bytes, uncompressed_size=2684 bytes)
+[debug] [2025-03-13T21:03:40.440Z] [unzip] Processing entry: client\android-chrome-192x192.png
+[debug] [2025-03-13T21:03:40.440Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.440Z] [unzip] Writing file: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\android-chrome-192x192.png
+[debug] [2025-03-13T21:03:40.442Z] [unzip] Entry: client/apple-touch-icon.png (compressed_size=2123 bytes, uncompressed_size=2152 bytes)
+[debug] [2025-03-13T21:03:40.442Z] [unzip] Processing entry: client\apple-touch-icon.png
+[debug] [2025-03-13T21:03:40.442Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.442Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\apple-touch-icon.png
+[debug] [2025-03-13T21:03:40.445Z] [unzip] Entry: client/android-chrome-512x512.png (compressed_size=5369 bytes, uncompressed_size=5411 bytes)
+[debug] [2025-03-13T21:03:40.445Z] [unzip] Processing entry: client\android-chrome-512x512.png
+[debug] [2025-03-13T21:03:40.445Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.445Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\android-chrome-512x512.png
+[debug] [2025-03-13T21:03:40.447Z] [unzip] Entry: client/manifest.json (compressed_size=245 bytes, uncompressed_size=551 bytes)
+[debug] [2025-03-13T21:03:40.447Z] [unzip] Processing entry: client\manifest.json
+[debug] [2025-03-13T21:03:40.448Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.448Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\manifest.json
+[debug] [2025-03-13T21:03:40.450Z] [unzip] Entry: client/robots.txt (compressed_size=26 bytes, uncompressed_size=26 bytes)
+[debug] [2025-03-13T21:03:40.450Z] [unzip] Processing entry: client\robots.txt
+[debug] [2025-03-13T21:03:40.450Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.451Z] [unzip] Writing file: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\robots.txt
+[debug] [2025-03-13T21:03:40.452Z] [unzip] Entry: client/mstile-150x150.png (compressed_size=2034 bytes, uncompressed_size=2034 bytes)
+[debug] [2025-03-13T21:03:40.452Z] [unzip] Processing entry: client\mstile-150x150.png
+[debug] [2025-03-13T21:03:40.452Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.452Z] [unzip] Writing file: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\mstile-150x150.png
+[debug] [2025-03-13T21:03:40.453Z] [unzip] Entry: client/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2025-03-13T21:03:40.453Z] [unzip] Processing entry: client\assets\
+[debug] [2025-03-13T21:03:40.453Z] [unzip] mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\
+[debug] [2025-03-13T21:03:40.454Z] [unzip] Entry: client/assets/index-ClZTY_JS.js.map (compressed_size=2328270 bytes, uncompressed_size=9947004 bytes)
+[debug] [2025-03-13T21:03:40.454Z] [unzip] Processing entry: client\assets\index-ClZTY_JS.js.map
+[debug] [2025-03-13T21:03:40.454Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets
+[debug] [2025-03-13T21:03:40.455Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\index-ClZTY_JS.js.map
+[debug] [2025-03-13T21:03:40.595Z] [unzip] Entry: client/assets/index-ClZTY_JS.js (compressed_size=567195 bytes, uncompressed_size=2035940 bytes)
+[debug] [2025-03-13T21:03:40.595Z] [unzip] Processing entry: client\assets\index-ClZTY_JS.js
+[debug] [2025-03-13T21:03:40.595Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets
+[debug] [2025-03-13T21:03:40.595Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\index-ClZTY_JS.js
+[debug] [2025-03-13T21:03:40.627Z] [unzip] Entry: client/assets/index-BdgySamB.css (compressed_size=35979 bytes, uncompressed_size=298654 bytes)
+[debug] [2025-03-13T21:03:40.627Z] [unzip] Processing entry: client\assets\index-BdgySamB.css
+[debug] [2025-03-13T21:03:40.627Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets
+[debug] [2025-03-13T21:03:40.628Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\index-BdgySamB.css
+[debug] [2025-03-13T21:03:40.639Z] [unzip] Entry: client/assets/extensions/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2025-03-13T21:03:40.639Z] [unzip] Processing entry: client\assets\extensions\
+[debug] [2025-03-13T21:03:40.640Z] [unzip] mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\extensions\
+[debug] [2025-03-13T21:03:40.640Z] [unzip] Entry: client/assets/extensions/default-extension.png (compressed_size=1646 bytes, uncompressed_size=1657 bytes)
+[debug] [2025-03-13T21:03:40.640Z] [unzip] Processing entry: client\assets\extensions\default-extension.png
+[debug] [2025-03-13T21:03:40.641Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\extensions
+[debug] [2025-03-13T21:03:40.641Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\extensions\default-extension.png
+[debug] [2025-03-13T21:03:40.643Z] [unzip] Entry: client/assets/img/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2025-03-13T21:03:40.643Z] [unzip] Processing entry: client\assets\img\
+[debug] [2025-03-13T21:03:40.643Z] [unzip] mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\img\
+[debug] [2025-03-13T21:03:40.644Z] [unzip] Entry: client/assets/img/database.png (compressed_size=29449 bytes, uncompressed_size=29988 bytes)
+[debug] [2025-03-13T21:03:40.645Z] [unzip] Processing entry: client\assets\img\database.png
+[debug] [2025-03-13T21:03:40.645Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\img
+[debug] [2025-03-13T21:03:40.645Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\img\database.png
+[debug] [2025-03-13T21:03:40.647Z] [unzip] Entry: client/assets/provider-icons/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2025-03-13T21:03:40.648Z] [unzip] Processing entry: client\assets\provider-icons\
+[debug] [2025-03-13T21:03:40.648Z] [unzip] mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\
+[debug] [2025-03-13T21:03:40.648Z] [unzip] Entry: client/assets/provider-icons/auth_service_saml.svg (compressed_size=575 bytes, uncompressed_size=1226 bytes)
+[debug] [2025-03-13T21:03:40.648Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_saml.svg
+[debug] [2025-03-13T21:03:40.648Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.649Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_saml.svg
+[debug] [2025-03-13T21:03:40.650Z] [unzip] Entry: client/assets/provider-icons/auth_service_phone.svg (compressed_size=261 bytes, uncompressed_size=414 bytes)
+[debug] [2025-03-13T21:03:40.651Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_phone.svg
+[debug] [2025-03-13T21:03:40.651Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.651Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_phone.svg
+[debug] [2025-03-13T21:03:40.653Z] [unzip] Entry: client/assets/provider-icons/auth_service_facebook.svg (compressed_size=289 bytes, uncompressed_size=457 bytes)
+[debug] [2025-03-13T21:03:40.653Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2025-03-13T21:03:40.653Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.654Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2025-03-13T21:03:40.655Z] [unzip] Entry: client/assets/provider-icons/auth_service_game_center.svg (compressed_size=991 bytes, uncompressed_size=3921 bytes)
+[debug] [2025-03-13T21:03:40.656Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2025-03-13T21:03:40.656Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.656Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2025-03-13T21:03:40.658Z] [unzip] Entry: client/assets/provider-icons/auth_service_apple.svg (compressed_size=230 bytes, uncompressed_size=334 bytes)
+[debug] [2025-03-13T21:03:40.658Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_apple.svg
+[debug] [2025-03-13T21:03:40.658Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.658Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_apple.svg
+[debug] [2025-03-13T21:03:40.660Z] [unzip] Entry: client/assets/provider-icons/auth_service_github.svg (compressed_size=466 bytes, uncompressed_size=838 bytes)
+[debug] [2025-03-13T21:03:40.660Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_github.svg
+[debug] [2025-03-13T21:03:40.660Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.661Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_github.svg
+[debug] [2025-03-13T21:03:40.663Z] [unzip] Entry: client/assets/provider-icons/auth_service_mslive.svg (compressed_size=203 bytes, uncompressed_size=378 bytes)
+[debug] [2025-03-13T21:03:40.663Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2025-03-13T21:03:40.664Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.664Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2025-03-13T21:03:40.666Z] [unzip] Entry: client/assets/provider-icons/auth_service_yahoo.svg (compressed_size=577 bytes, uncompressed_size=1182 bytes)
+[debug] [2025-03-13T21:03:40.666Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2025-03-13T21:03:40.666Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.666Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2025-03-13T21:03:40.668Z] [unzip] Entry: client/assets/provider-icons/auth_service_twitter.svg (compressed_size=444 bytes, uncompressed_size=751 bytes)
+[debug] [2025-03-13T21:03:40.668Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2025-03-13T21:03:40.668Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.669Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2025-03-13T21:03:40.671Z] [unzip] Entry: client/assets/provider-icons/auth_service_play_games.svg (compressed_size=565 bytes, uncompressed_size=1173 bytes)
+[debug] [2025-03-13T21:03:40.671Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2025-03-13T21:03:40.671Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.671Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2025-03-13T21:03:40.673Z] [unzip] Entry: client/assets/provider-icons/auth_service_email.svg (compressed_size=228 bytes, uncompressed_size=326 bytes)
+[debug] [2025-03-13T21:03:40.673Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_email.svg
+[debug] [2025-03-13T21:03:40.673Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.674Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_email.svg
+[debug] [2025-03-13T21:03:40.676Z] [unzip] Entry: client/assets/provider-icons/auth_service_google.svg (compressed_size=409 bytes, uncompressed_size=720 bytes)
+[debug] [2025-03-13T21:03:40.676Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_google.svg
+[debug] [2025-03-13T21:03:40.677Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.677Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_google.svg
+[debug] [2025-03-13T21:03:40.682Z] [unzip] Entry: client/assets/provider-icons/auth_service_oidc.svg (compressed_size=414 bytes, uncompressed_size=858 bytes)
+[debug] [2025-03-13T21:03:40.682Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2025-03-13T21:03:40.682Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
+[debug] [2025-03-13T21:03:40.682Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2025-03-13T21:03:40.684Z] [unzip] Entry: client/browserconfig.xml (compressed_size=491 bytes, uncompressed_size=822 bytes)
+[debug] [2025-03-13T21:03:40.684Z] [unzip] Processing entry: client\browserconfig.xml
+[debug] [2025-03-13T21:03:40.685Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.685Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\browserconfig.xml
+[debug] [2025-03-13T21:03:40.686Z] [unzip] Entry: client/favicon-32x32.png (compressed_size=475 bytes, uncompressed_size=475 bytes)
+[debug] [2025-03-13T21:03:40.687Z] [unzip] Processing entry: client\favicon-32x32.png
+[debug] [2025-03-13T21:03:40.687Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client
+[debug] [2025-03-13T21:03:40.687Z] [unzip] Writing file: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\client\favicon-32x32.png
+[debug] [2025-03-13T21:03:40.688Z] [unzip] Entry: server/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2025-03-13T21:03:40.689Z] [unzip] Processing entry: server\
+[debug] [2025-03-13T21:03:40.689Z] [unzip] mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\
+[debug] [2025-03-13T21:03:40.689Z] [unzip] Entry: server/server.mjs.map (compressed_size=296496 bytes, uncompressed_size=1355667 bytes)
+[debug] [2025-03-13T21:03:40.689Z] [unzip] Processing entry: server\server.mjs.map
+[debug] [2025-03-13T21:03:40.690Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server
+[debug] [2025-03-13T21:03:40.690Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\server.mjs.map
+[debug] [2025-03-13T21:03:40.708Z] [unzip] Entry: server/server.mjs (compressed_size=315701 bytes, uncompressed_size=1172682 bytes)
+[debug] [2025-03-13T21:03:40.709Z] [unzip] Processing entry: server\server.mjs
+[debug] [2025-03-13T21:03:40.709Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server
+[debug] [2025-03-13T21:03:40.709Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\server.mjs
+[debug] [2025-03-13T21:03:40.731Z] [unzip] Entry: server/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2025-03-13T21:03:40.731Z] [unzip] Processing entry: server\assets\
+[debug] [2025-03-13T21:03:40.731Z] [unzip] mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\assets\
+[debug] [2025-03-13T21:03:40.732Z] [unzip] Entry: server/assets/multipart-parser-DGCUZdXu.mjs.map (compressed_size=4791 bytes, uncompressed_size=17918 bytes)
+[debug] [2025-03-13T21:03:40.732Z] [unzip] Processing entry: server\assets\multipart-parser-DGCUZdXu.mjs.map
+[debug] [2025-03-13T21:03:40.732Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\assets
+[debug] [2025-03-13T21:03:40.732Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\assets\multipart-parser-DGCUZdXu.mjs.map
+[debug] [2025-03-13T21:03:40.735Z] [unzip] Entry: server/assets/multipart-parser-DGCUZdXu.mjs (compressed_size=2621 bytes, uncompressed_size=10390 bytes)
+[debug] [2025-03-13T21:03:40.735Z] [unzip] Processing entry: server\assets\multipart-parser-DGCUZdXu.mjs
+[debug] [2025-03-13T21:03:40.735Z] [unzip] else mkdir: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\assets
+[debug] [2025-03-13T21:03:40.735Z] [unzip] deflating: C:\Users\tasha\.cache\firebase\emulators\ui-v1.14.0\server\assets\multipart-parser-DGCUZdXu.mjs
+[debug] [2025-03-13T21:03:40.741Z] [Extensions] Connecting Extensions emulator, this is a noop.
+[info] i  functions: Watching "C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\" for Cloud Functions..."}}
+[debug] [2025-03-13T21:03:40.758Z] Validating nodejs source
+[debug] [2025-03-13T21:03:42.677Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1",
+    "pg": "^8.14.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-03-13T21:03:42.677Z] Building nodejs source
+[debug] [2025-03-13T21:03:42.678Z] Failed to find version of module node: reached end of search path C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\node_modules
+[info] +  functions: Using node@22 from host. 
+[debug] [2025-03-13T21:03:42.683Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-03-13T21:03:42.702Z] Found firebase-functions binary at 'C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8644
+
+[debug] [2025-03-13T21:03:44.316Z] Got response from /__/functions.yaml {"endpoints":{"getFiles":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"getFiles"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2025-03-13T21:03:48.413Z] defaultcredentials: writing to file C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json
+[debug] [2025-03-13T21:03:48.415Z] Setting GAC to C:\Users\tasha\AppData\Roaming\firebase\seomin042_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\tasha\\AppData\\Roaming\\firebase\\seomin042_gmail_com_application_default_credentials.json"}}
+[info] +  functions: Loaded functions definitions from source: getFiles. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: getFiles."}}
+[info] +  functions[us-central1-getFiles]: http function initialized (http://127.0.0.1:5001/coonectech/us-central1/getFiles). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/coonectech/us-central1/getFiles)."}}
+[debug] [2025-03-13T21:03:48.445Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────────────┬──────────────────────────────────┐
+│ Emulator   │ Host:Port      │ View in Emulator UI              │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Functions  │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions  │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Extensions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/extensions │
+└────────────┴────────────────┴──────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+┌─────────────────────────┬───────────────┬─────────────────────┐
+│ Extension Instance Name │ Extension Ref │ View in Emulator UI │
+└─────────────────────────┴───────────────┴─────────────────────┘
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2025-03-13T21:06:22.002Z] [work-queue] {"queuedWork":["/coonectech/us-central1/getFiles-2025-03-13T21:06:22.001Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-03-13T21:06:22.004Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/coonectech/us-central1/getFiles-2025-03-13T21:06:22.001Z"],"workRunningCount":1}
+[debug] [2025-03-13T21:06:22.005Z] Accepted request GET /coonectech/us-central1/getFiles --> us-central1-getFiles
+[debug] [2025-03-13T21:06:22.023Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-03-13T21:06:22.026Z] [functions] Got req.url=/coonectech/us-central1/getFiles, mapping to path=/ {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/coonectech/us-central1/getFiles, mapping to path=/"}}
+[debug] [2025-03-13T21:06:22.057Z] [worker-pool] addWorker(us-central1-getFiles) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] addWorker(us-central1-getFiles)"}}
+[debug] [2025-03-13T21:06:22.058Z] [worker-pool] Adding worker with key us-central1-getFiles, total=1 {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] Adding worker with key us-central1-getFiles, total=1"}}
+[debug] [2025-03-13T21:06:24.892Z] [runtime-status] [19768] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"12.7.0\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2025-03-13T21:06:24.894Z] [runtime-status] [19768] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.3.2","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.3.2\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-03-13T21:06:24.895Z] [runtime-status] [19768] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}] {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Outgoing network have been stubbed. [{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"net\",\"status\":\"mocked\"}]"}}
+[debug] [2025-03-13T21:06:24.897Z] [runtime-status] [19768] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.3.2","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.3.2\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-03-13T21:06:25.646Z] [runtime-status] [19768] Checked functions.config() {"config":{}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Checked functions.config() {\"config\":{}}"}}
+[debug] [2025-03-13T21:06:25.646Z] [runtime-status] [19768] firebase-functions has been stubbed. {"functionsResolution":{"declared":true,"installed":true,"version":"6.3.2","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] firebase-functions has been stubbed. {\"functionsResolution\":{\"declared\":true,\"installed\":true,\"version\":\"6.3.2\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}}"}}
+[debug] [2025-03-13T21:06:25.648Z] [runtime-status] [19768] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.3.2","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.3.2\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-03-13T21:06:25.660Z] [runtime-status] [19768] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"12.7.0\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}"}}
+[debug] [2025-03-13T21:06:25.666Z] [runtime-status] [19768] Resolved module firebase-functions {"declared":true,"installed":true,"version":"6.3.2","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"6.3.2\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-functions\\\\lib\\\\v2\\\\index.js\"}"}}
+[debug] [2025-03-13T21:06:25.666Z] [runtime-status] [19768] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\firebase-admin\\lib\\index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] firebase-admin has been stubbed. {\"adminResolution\":{\"declared\":true,\"installed\":true,\"version\":\"12.7.0\",\"resolution\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\\\\node_modules\\\\firebase-admin\\\\lib\\\\index.js\"}}"}}
+[debug] [2025-03-13T21:06:25.729Z] [runtime-status] [19768] Functions runtime initialized. {"cwd":"C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions","node_version":"22.14.0"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Functions runtime initialized. {\"cwd\":\"C:\\\\Users\\\\tasha\\\\OneDrive\\\\Desktop\\\\CSE120\\\\Backend\\\\functions\",\"node_version\":\"22.14.0\"}"}}
+[debug] [2025-03-13T21:06:25.730Z] [runtime-status] [19768] Listening to port: \\?\pipe\fire_emu_b4e4aa53baa2c9ff {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[runtime-status] [19768] Listening to port: \\\\?\\pipe\\fire_emu_b4e4aa53baa2c9ff"}}
+[debug] [2025-03-13T21:06:25.807Z] [worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: IDLE"}}
+[debug] [2025-03-13T21:06:25.807Z] [worker-pool] submitRequest(triggerId=us-central1-getFiles) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-getFiles)"}}
+[info] i  functions: Beginning execution of "us-central1-getFiles" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Beginning execution of \"us-central1-getFiles\""}}
+[debug] [2025-03-13T21:06:25.808Z] [worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: BUSY"}}
+[info] >  Database Error: Error: getaddrinfo ENOTFOUND your-remote-host {"user":"Database Error: Error: getaddrinfo ENOTFOUND your-remote-host","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m Database Error: Error: getaddrinfo ENOTFOUND your-remote-host"}}
+[info] >      at C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\node_modules\pg-pool\index.js:45:11 {"user":"    at C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\pg-pool\\index.js:45:11","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\pg-pool\\index.js:45:11"}}
+[info] >      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {"user":"    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)"}}
+[info] >      at async C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\index.js:22:20 {"user":"    at async C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\index.js:22:20","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\index.js:22:20"}}
+[info] >      at async runFunction (C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\emulator\functionsEmulatorRuntime.js:506:9) {"user":"    at async runFunction (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:506:9)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async runFunction (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:506:9)"}}
+[info] >      at async runHTTPS (C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\emulator\functionsEmulatorRuntime.js:531:5) {"user":"    at async runHTTPS (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:531:5)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async runHTTPS (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:531:5)"}}
+[info] >      at async C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\emulator\functionsEmulatorRuntime.js:694:21 { {"user":"    at async C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:694:21 {","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:694:21 {"}}
+[info] >    errno: -3008, {"user":"  errno: -3008,","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   errno: -3008,"}}
+[info] >    code: 'ENOTFOUND', {"user":"  code: 'ENOTFOUND',","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   code: 'ENOTFOUND',"}}
+[info] >    syscall: 'getaddrinfo', {"user":"  syscall: 'getaddrinfo',","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   syscall: 'getaddrinfo',"}}
+[info] >    hostname: 'your-remote-host' {"user":"  hostname: 'your-remote-host'","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   hostname: 'your-remote-host'"}}
+[info] >  } {"user":"}","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m }"}}
+[debug] [2025-03-13T21:06:26.876Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-getFiles" in 1068.157ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finished \"us-central1-getFiles\" in 1068.157ms"}}
+[debug] [2025-03-13T21:06:26.878Z] [worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: IDLE"}}
+[debug] [2025-03-13T21:06:26.878Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-03-13T21:06:26.879Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-03-13T21:06:26.879Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
+[debug] [2025-03-13T21:06:27.032Z] Functions emulator received unknown request at path /favicon.ico
+[debug] [2025-03-13T21:08:59.462Z] [work-queue] {"queuedWork":["/coonectech/us-central1/getFiles-2025-03-13T21:08:59.462Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2025-03-13T21:08:59.463Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/coonectech/us-central1/getFiles-2025-03-13T21:08:59.462Z"],"workRunningCount":1}
+[debug] [2025-03-13T21:08:59.463Z] Accepted request GET /coonectech/us-central1/getFiles --> us-central1-getFiles
+[debug] [2025-03-13T21:08:59.472Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2025-03-13T21:08:59.472Z] [functions] Got req.url=/coonectech/us-central1/getFiles, mapping to path=/ {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/coonectech/us-central1/getFiles, mapping to path=/"}}
+[debug] [2025-03-13T21:08:59.473Z] [worker-pool] submitRequest(triggerId=us-central1-getFiles) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-getFiles)"}}
+[info] i  functions: Beginning execution of "us-central1-getFiles" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Beginning execution of \"us-central1-getFiles\""}}
+[debug] [2025-03-13T21:08:59.475Z] [worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: BUSY"}}
+[info] >  Database Error: Error: getaddrinfo ENOTFOUND your-remote-host {"user":"Database Error: Error: getaddrinfo ENOTFOUND your-remote-host","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m Database Error: Error: getaddrinfo ENOTFOUND your-remote-host"}}
+[info] >      at C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\node_modules\pg-pool\index.js:45:11 {"user":"    at C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\pg-pool\\index.js:45:11","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\node_modules\\pg-pool\\index.js:45:11"}}
+[info] >      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {"user":"    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)"}}
+[info] >      at async C:\Users\tasha\OneDrive\Desktop\CSE120\Backend\functions\index.js:22:20 {"user":"    at async C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\index.js:22:20","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async C:\\Users\\tasha\\OneDrive\\Desktop\\CSE120\\Backend\\functions\\index.js:22:20"}}
+[info] >      at async runFunction (C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\emulator\functionsEmulatorRuntime.js:506:9) {"user":"    at async runFunction (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:506:9)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async runFunction (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:506:9)"}}
+[info] >      at async runHTTPS (C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\emulator\functionsEmulatorRuntime.js:531:5) {"user":"    at async runHTTPS (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:531:5)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async runHTTPS (C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:531:5)"}}
+[info] >      at async C:\Users\tasha\AppData\Roaming\npm\node_modules\firebase-tools\lib\emulator\functionsEmulatorRuntime.js:694:21 { {"user":"    at async C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:694:21 {","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m     at async C:\\Users\\tasha\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\emulator\\functionsEmulatorRuntime.js:694:21 {"}}
+[info] >    errno: -3008, {"user":"  errno: -3008,","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   errno: -3008,"}}
+[info] >    code: 'ENOTFOUND', {"user":"  code: 'ENOTFOUND',","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   code: 'ENOTFOUND',"}}
+[info] >    syscall: 'getaddrinfo', {"user":"  syscall: 'getaddrinfo',","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   syscall: 'getaddrinfo',"}}
+[info] >    hostname: 'your-remote-host' {"user":"  hostname: 'your-remote-host'","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m   hostname: 'your-remote-host'"}}
+[info] >  } {"user":"}","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"\u001b[90m> \u001b[39m }"}}
+[debug] [2025-03-13T21:09:00.541Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-getFiles" in 1067.2139ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finished \"us-central1-getFiles\" in 1067.2139ms"}}
+[debug] [2025-03-13T21:09:00.544Z] [worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"[worker-us-central1-getFiles-9aa65d8e-a623-40f3-bfa2-e85b5973c7ae]: IDLE"}}
+[debug] [2025-03-13T21:09:00.544Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2025-03-13T21:09:00.545Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-getFiles"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2025-03-13T21:09:00.546Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
