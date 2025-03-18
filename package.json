@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "demp",
   "main": "expo-router/entry",
   "version": "1.0.0",
@@ -22,6 +21,9 @@
     "@react-navigation/drawer": "^7.1.1",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
+    "axios": "^1.8.3",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "expo": "~52.0.37",
     "expo-blur": "~14.0.3",
@@ -37,6 +39,8 @@
     "expo-system-ui": "~4.0.8",
     "expo-web-browser": "~14.0.2",
     "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.14.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
@@ -46,7 +50,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5"
+    "react-native-webview": "13.12.5",
+    "streamifier": "^0.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -59,34 +64,16 @@
     "typescript": "^5.3.3"
   },
   "private": true,
-  "description": "A File storage app to be used as an organization tool \r The requirement of this phase of the project is a web and mobile application that:\r   - captures objects (first text notes, then other file types)\r   - assigns a unique identifier and a URL to every new object\r   - stores the object with the timestamp and other metadata (when, where, who, what)\r   - enables the user to search for objects (by when, where, who, what)\r   - enables the user to select objects and connect them into new objects",
+  "description": "A File storage app to be used as an organization tool. The requirement of this phase of the project is a web and mobile application that: captures objects (first text notes, then other file types), assigns a unique identifier and a URL to every new object, stores the object with the timestamp and other metadata (when, where, who, what), enables the user to search for objects (by when, where, who, what), enables the user to select objects and connect them into new objects.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/archeasphere/Networking-Engagement-Information-Capture-and-Aggregation-App-I2G.git"
-=======
-  "name": "backend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
->>>>>>> d3759f0 (Initial commit - Added Firebase functions and config files)
+    "url": "https://github.com/archeasphere/Networking-Engagement-Information-Capture-and-Aggregation-App-I2G.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-<<<<<<< HEAD
   "bugs": {
     "url": "https://github.com/archeasphere/Networking-Engagement-Information-Capture-and-Aggregation-App-I2G/issues"
   },
-  "homepage": "https://github.com/archeasphere/Networking-Engagement-Information-Capture-and-Aggregation-App-I2G#readme"
-=======
-  "description": "",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "firebase-admin": "^13.2.0",
-    "pg": "^8.14.0"
-  }
->>>>>>> d3759f0 (Initial commit - Added Firebase functions and config files)
+  "homepage": "https://github.com/archeasphere/Networking-Engagement-Information-Capture-and-Aggregation-App-I2G#readme",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
