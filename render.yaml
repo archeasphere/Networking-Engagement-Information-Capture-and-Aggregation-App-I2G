@@ -1,36 +1,25 @@
-#################################################################
-# Example render.yaml                                           #
-# Do not use this file directly! Consult it for reference only. #
-#################################################################
-
-previews:
-  generation: automatic # Enable preview environments
-
-# List all services *except* PostgreSQL databases here
+# Render Deployment Configuration File
 services:
-  # A web service on the Ruby native runtime
-
-# A static site
   - type: web
-    name: my-blog
-    runtime: static
-    buildCommand: yarn build
-    staticPublishPath: ./build
-    previews:
-      generation: automatic # Enable service previews
-    buildFilter:
-      paths:
-      - server.js
-      ignoredPaths:
-      - src/**/*.test.js
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: sameorigin
+    name: backend-service
+    runtime: node
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: my-database
+          property: connectionString
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
 
-# List all PostgreSQL databases here
 databases:
-  # A database with one read replica
-  - name: elephant
-    readReplicas:
-      - name: elephant-replica
+  - name: my-database
+    plan: free
+
