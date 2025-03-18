@@ -1,29 +1,96 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 export default function CreateAccountScreen() {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleCreateAccount = () => {
+    // Implement account creation logic here
+    navigation.replace('Drawer');
+  };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212', padding: 20 }}>
-      <Text style={{ color: 'white', fontSize: 24, marginBottom: 20 }}>Create Account</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Create Account</Text>
 
-      <TextInput placeholder="Email" placeholderTextColor="#BBB" style={styles.input} />
-      <TextInput placeholder="Password" placeholderTextColor="#BBB" secureTextEntry style={styles.input} />
-      <TextInput placeholder="Confirm Password" placeholderTextColor="#BBB" secureTextEntry style={styles.input} />
+      <TextInput
+        placeholder="Email"
+        placeholderTextColor="#BBB"
+        value={email}
+        onChangeText={setEmail}
+        style={styles.input}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={{ color: '#121212', fontSize: 16, fontWeight: 'bold' }}>Create Account</Text>
+      <TextInput
+        placeholder="Password"
+        placeholderTextColor="#BBB"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        style={styles.input}
+      />
+
+      <TextInput
+        placeholder="Confirm Password"
+        placeholderTextColor="#BBB"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        style={styles.input}
+      />
+
+      <TouchableOpacity onPress={handleCreateAccount} style={styles.button}>
+        <Text style={styles.buttonText}>Create Account</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={{ color: '#FFD700' }}>Already have an account? Sign In</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.link}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = {
-  input: { backgroundColor: '#1E1E1E', color: 'white', padding: 12, borderRadius: 8, width: '30%', marginBottom: 10 },
-  button: { backgroundColor: '#FFD700', padding: 12, borderRadius: 8, width: '30%', alignItems: 'center', marginBottom: 10 },
-};
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#121212',
+    padding: 20,
+  },
+  title: {
+    color: 'white',
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  input: {
+    backgroundColor: '#1E1E1E',
+    color: 'white',
+    padding: 12,
+    borderRadius: 8,
+    width: '80%',
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#FFD700',
+    padding: 12,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: '#121212',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  link: {
+    color: '#FFD700',
+  },
+});
