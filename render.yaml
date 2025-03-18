@@ -1,12 +1,30 @@
 # Exported from Render on 2025-03-18T20:17:56Z
 databases:
-- name: Backend
   databaseName: connectteck
   user: ucmerced
-  plan: free
   region: oregon
   ipAllowList:
   - source: 0.0.0.0/0
     description: everywhere
   postgresMajorVersion: "16"
 version: "1"
+
+services:
+  - type: web
+    name: backend-service
+    runtime: node
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: Backend  # ✅ Use the existing database
+          property: connectionString
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
