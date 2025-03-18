@@ -1,8 +1,8 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import TagModal from './TagModal';
@@ -10,7 +10,7 @@ import LoginScreen from './login';
 import SidebarContent from './SidebarContent';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
-import { BlurView } from 'expo-blur'; // Import BlurView for the blurred background
+import { BlurView } from 'expo-blur';
 
 const Drawer = createDrawerNavigator();
 
@@ -45,6 +45,7 @@ function HomeScreen({ navigation }) {
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
+  const [showDropdownFor, setShowDropdownFor] = useState(null); // ID of the file for which dropdown is visible
 
   const filteredFiles = files.filter((file) =>
     file.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -118,15 +119,64 @@ function HomeScreen({ navigation }) {
 
   // Handler for opening the file options menu
   const handleOptionsMenu = (file) => {
-    // Here you would typically show a context menu or action sheet
-    console.log('Options menu for file:', file.name);
-    // You could implement additional functionality here
+    // Toggle dropdown visibility for this file
+    setShowDropdownFor(showDropdownFor === file.id ? null : file.id);
+  };
+
+  // Handle file deletion
+  const handleDeleteFile = (fileId) => {
+    // Show confirmation alert before deletion
+    Alert.alert(
+      "Delete File",
+      "Are you sure you want to delete this file?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { 
+          text: "Delete", 
+          onPress: () => {
+            setFiles(files.filter(file => file.id !== fileId));
+            setShowDropdownFor(null); // Hide dropdown after deletion
+          },
+          style: "destructive"
+        }
+      ]
+    );
+  };
+
+  // Handle file sharing
+  const handleShareFile = (file) => {
+    Alert.alert(
+      "Share File",
+      `Sharing options for ${file.name} will appear here.`,
+      [{ text: "OK" }]
+    );
+    setShowDropdownFor(null); // Hide dropdown after action
+  };
+
+  // Handle file permissions
+  const handleFilePermissions = (file) => {
+    Alert.alert(
+      "File Permissions",
+      `Permission settings for ${file.name} will appear here.`,
+      [{ text: "OK" }]
+    );
+    setShowDropdownFor(null); // Hide dropdown after action
   };
 
   // Handler for previewing a file
   const handleFilePreview = (file) => {
     setPreviewFile(file);
     setPreviewModalVisible(true);
+  };
+
+  // Close dropdown when clicking elsewhere
+  const handleOutsideClick = () => {
+    if (showDropdownFor) {
+      setShowDropdownFor(null);
+    }
   };
 
   // Render the file preview content based on file type
@@ -174,9 +224,59 @@ function HomeScreen({ navigation }) {
     }
   };
 
+  // Render each dropdown menu separately at the root level
+  const renderDropdownMenus = () => {
+    if (!showDropdownFor) return null;
+    
+    const file = [...files, ...labels].find(item => item.id === showDropdownFor);
+    if (!file || file.type !== 'file') return null;
+    
+    // Find the position of the file item in the list
+    const fileIndex = filteredFiles.findIndex(item => item.id === showDropdownFor);
+    if (fileIndex === -1) return null;
+    
+    // Calculate the position of the dropdown
+    const itemHeight = isGridView ? 140 : 60; // Approximate height of items
+    const dropdownTopPosition = 60 + (fileIndex * itemHeight);
+    
+    return (
+      <View style={[styles.dropdownMenu, {
+        position: 'absolute',
+        top: Math.min(dropdownTopPosition, 300), // Limit how far down it can go
+        right: 28,
+        zIndex: 9999,
+        elevation: 9999,
+      }]}>
+        <TouchableOpacity 
+          style={styles.dropdownItem}
+          onPress={() => handleShareFile(file)}
+        >
+          <Ionicons name="share-social-outline" size={16} color="#000000" />
+          <ThemedText style={styles.dropdownItemText}>Share</ThemedText>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.dropdownItem}
+          onPress={() => handleFilePermissions(file)}
+        >
+          <Ionicons name="lock-closed-outline" size={16} color="#000000" />
+          <ThemedText style={styles.dropdownItemText}>Permissions</ThemedText>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.dropdownItem, styles.deleteItem]}
+          onPress={() => handleDeleteFile(file.id)}
+        >
+          <Ionicons name="trash-outline" size={16} color="#FF3B30" />
+          <ThemedText style={styles.deleteItemText}>Delete</ThemedText>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   const renderItem = ({ item }) => (
     <View style={[isGridView ? styles.gridItem : styles.rowItem]}>
-      {/* Checkbox area - now properly separated */}
+      {/* Checkbox area */}
       <View style={styles.checkboxContainer}>
         <Checkbox
           value={selectedFiles.includes(item.id)}
@@ -209,18 +309,20 @@ function HomeScreen({ navigation }) {
         </ThemedText>
       </TouchableOpacity>
       
-      {/* Timestamp - now properly aligned to the right */}
+      {/* Timestamp - only for list view */}
       {!isGridView && (
         <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>
       )}
       
       {/* Options menu */}
-      <TouchableOpacity 
-        style={styles.menuIconContainer}
-        onPress={() => handleOptionsMenu(item)}
-      >
-        <Ionicons name="ellipsis-vertical" size={20} color="#000000" />
-      </TouchableOpacity>
+      <View style={styles.menuContainer}>
+        <TouchableOpacity 
+          style={styles.menuIconContainer}
+          onPress={() => handleOptionsMenu(item)}
+        >
+          <Ionicons name="ellipsis-vertical" size={20} color="#000000" />
+        </TouchableOpacity>
+      </View>
       
       {/* Grid-specific layout adjustments */}
       {isGridView && (
@@ -233,143 +335,152 @@ function HomeScreen({ navigation }) {
   );
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.searchBar}>
-        <Ionicons name="search-outline" size={20} color="#B0B0B0" />
-        <TextInput
-          placeholder="Search files and labels..."
-          placeholderTextColor="#B0B0B0"
-          style={styles.searchInput}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-      
-      {selectedFiles.length > 0 && (
-        <TouchableOpacity style={styles.tagButton} onPress={() => setModalVisible(true)}>
-          <Ionicons name="pricetag-outline" size={20} color="#FFFFFF" />
-          <ThemedText style={styles.tagButtonText}> Create Label</ThemedText>
-        </TouchableOpacity>
-      )}
-      
-      {/* Files Section */}
-      <View style={styles.header}>
-        <ThemedText style={styles.titleText}>My Files</ThemedText>
-        <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
-          <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
-        </TouchableOpacity>
-      </View>
-      
-      <FlatList
-        data={filteredFiles}
-        key={isGridView ? 'grid-files' : 'list-files'}
-        numColumns={isGridView ? 2 : 1}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        style={styles.listContainer}
-      />
-      
-      {/* Labels Section */}
-      <View style={[styles.header, styles.labelsHeader]}>
-        <ThemedText style={styles.titleText}>Labels</ThemedText>
-      </View>
-      
-      <FlatList
-        data={filteredLabels}
-        key={isGridView ? 'grid-labels' : 'list-labels'}
-        numColumns={isGridView ? 2 : 1}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        style={styles.listContainer}
-      />
-      
-      {/* Upload Button (FAB) */}
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() => setUploadModalVisible(true)}
-      >
-        <Ionicons name="cloud-upload-outline" size={24} color="#FFFFFF" />
-      </TouchableOpacity>
-      
-      {/* Tag Modal */}
-      <TagModal
-        visible={modalVisible}
-        TagName={newTagName}
-        onChangeTagName={setNewTagName}
-        onCancel={() => setModalVisible(false)}
-        onConfirm={confirmCreateTag}
-      />
-      
-      {/* Upload Files Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={uploadModalVisible}
-        onRequestClose={() => setUploadModalVisible(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <ThemedText style={styles.modalTitle}>Upload File</ThemedText>
-            
-            {/* Drag and drop area */}
-            <View style={styles.uploadDropArea}>
-              <Ionicons name="cloud-upload-outline" size={48} color="#B0B0B0" />
-              <ThemedText style={styles.dropText}>Drop your file here</ThemedText>
-              <TouchableOpacity 
-                style={styles.clickToUpload}
-                onPress={() => handleFileUpload("MyFile.pdf")}
-              >
-                <ThemedText style={styles.clickToUploadText}>or click here to upload</ThemedText>
-              </TouchableOpacity>
-            </View>
-            
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setUploadModalVisible(false)}
-            >
-              <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
-            </TouchableOpacity>
-          </View>
+    <TouchableOpacity 
+      activeOpacity={1} 
+      style={{flex: 1}} 
+      onPress={handleOutsideClick}
+    >
+      <ThemedView style={styles.container}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={20} color="#B0B0B0" />
+          <TextInput
+            placeholder="Search files and labels..."
+            placeholderTextColor="#B0B0B0"
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
         </View>
-      </Modal>
-      
-      {/* File Preview Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={previewModalVisible}
-        onRequestClose={() => setPreviewModalVisible(false)}
-      >
-        <BlurView intensity={60} style={styles.blurContainer}>
-          <View style={styles.previewModalView}>
-            {/* File preview header */}
-            <View style={styles.previewHeader}>
-              <ThemedText style={styles.previewTitle}>
-                {previewFile?.name || "File Preview"}
-              </ThemedText>
-              <TouchableOpacity onPress={() => setPreviewModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#000000" />
-              </TouchableOpacity>
-            </View>
-            
-            {/* File preview content */}
-            {renderPreviewContent()}
-          </View>
-        </BlurView>
-      </Modal>
-      
-      {/* Selection indicator */}
-      {selectedFiles.length > 0 && (
-        <View style={styles.selectionIndicator}>
-          <ThemedText style={styles.selectionText}>
-            {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'} selected
-          </ThemedText>
-          <TouchableOpacity onPress={() => setSelectedFiles([])}>
-            <ThemedText style={styles.clearSelectionText}>Clear</ThemedText>
+        
+        {selectedFiles.length > 0 && (
+          <TouchableOpacity style={styles.tagButton} onPress={() => setModalVisible(true)}>
+            <Ionicons name="pricetag-outline" size={20} color="#FFFFFF" />
+            <ThemedText style={styles.tagButtonText}> Create Label</ThemedText>
+          </TouchableOpacity>
+        )}
+        
+        {/* Files Section */}
+        <View style={styles.header}>
+          <ThemedText style={styles.titleText}>My Files</ThemedText>
+          <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
+            <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
           </TouchableOpacity>
         </View>
-      )}
-    </ThemedView>
+        
+        <FlatList
+          data={filteredFiles}
+          key={isGridView ? 'grid-files' : 'list-files'}
+          numColumns={isGridView ? 2 : 1}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          style={styles.listContainer}
+        />
+        
+        {/* Labels Section */}
+        <View style={[styles.header, styles.labelsHeader]}>
+          <ThemedText style={styles.titleText}>Labels</ThemedText>
+        </View>
+        
+        <FlatList
+          data={filteredLabels}
+          key={isGridView ? 'grid-labels' : 'list-labels'}
+          numColumns={isGridView ? 2 : 1}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          style={styles.listContainer}
+        />
+        
+        {/* Render dropdown menus at the root level to ensure they appear on top */}
+        {renderDropdownMenus()}
+        
+        {/* Upload Button (FAB) */}
+        <TouchableOpacity
+          style={styles.uploadButton}
+          onPress={() => setUploadModalVisible(true)}
+        >
+          <Ionicons name="cloud-upload-outline" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+        
+        {/* Tag Modal */}
+        <TagModal
+          visible={modalVisible}
+          TagName={newTagName}
+          onChangeTagName={setNewTagName}
+          onCancel={() => setModalVisible(false)}
+          onConfirm={confirmCreateTag}
+        />
+        
+        {/* Upload Files Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={uploadModalVisible}
+          onRequestClose={() => setUploadModalVisible(false)}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <ThemedText style={styles.modalTitle}>Upload File</ThemedText>
+              
+              {/* Drag and drop area */}
+              <View style={styles.uploadDropArea}>
+                <Ionicons name="cloud-upload-outline" size={48} color="#B0B0B0" />
+                <ThemedText style={styles.dropText}>Drop your file here</ThemedText>
+                <TouchableOpacity 
+                  style={styles.clickToUpload}
+                  onPress={() => handleFileUpload("MyFile.pdf")}
+                >
+                  <ThemedText style={styles.clickToUploadText}>or click here to upload</ThemedText>
+                </TouchableOpacity>
+              </View>
+              
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setUploadModalVisible(false)}
+              >
+                <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        
+        {/* File Preview Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={previewModalVisible}
+          onRequestClose={() => setPreviewModalVisible(false)}
+        >
+          <BlurView intensity={60} style={styles.blurContainer}>
+            <View style={styles.previewModalView}>
+              {/* File preview header */}
+              <View style={styles.previewHeader}>
+                <ThemedText style={styles.previewTitle}>
+                  {previewFile?.name || "File Preview"}
+                </ThemedText>
+                <TouchableOpacity onPress={() => setPreviewModalVisible(false)}>
+                  <Ionicons name="close" size={24} color="#000000" />
+                </TouchableOpacity>
+              </View>
+              
+              {/* File preview content */}
+              {renderPreviewContent()}
+            </View>
+          </BlurView>
+        </Modal>
+        
+        {/* Selection indicator */}
+        {selectedFiles.length > 0 && (
+          <View style={styles.selectionIndicator}>
+            <ThemedText style={styles.selectionText}>
+              {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'} selected
+            </ThemedText>
+            <TouchableOpacity onPress={() => setSelectedFiles([])}>
+              <ThemedText style={styles.clearSelectionText}>Clear</ThemedText>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ThemedView>
+    </TouchableOpacity>
   );
 }
 
@@ -468,13 +579,51 @@ const styles = StyleSheet.create({
   timestamp: { 
     color: '#606060', 
     fontSize: 12,
-    marginRight: 10 // Add spacing to separate from the options menu
+    marginRight: 10 
+  },
+  menuContainer: {
+    position: 'relative',
   },
   menuIconContainer: {
     padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
+  // Dropdown menu styles - improved for better z-index handling
+  dropdownMenu: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 9999, // Highest elevation for Android
+    width: 150,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  dropdownItemText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#333333',
+  },
+  deleteItem: {
+    borderBottomWidth: 0,
+  },
+  deleteItemText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#FF3B30',
+  },
+  
   gridBottomSection: {
     width: '100%',
     marginTop: 8,
