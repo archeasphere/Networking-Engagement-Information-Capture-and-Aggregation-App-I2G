@@ -116,6 +116,13 @@ function HomeScreen({ navigation }) {
     setUploadModalVisible(false);
   };
 
+  // Handler for opening the file options menu
+  const handleOptionsMenu = (file) => {
+    // Here you would typically show a context menu or action sheet
+    console.log('Options menu for file:', file.name);
+    // You could implement additional functionality here
+  };
+
   // Handler for previewing a file
   const handleFilePreview = (file) => {
     setPreviewFile(file);
@@ -168,26 +175,61 @@ function HomeScreen({ navigation }) {
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => {
-        if (item.type === 'file') {
-          handleFilePreview(item);
-        }
-      }}
-      style={[isGridView ? styles.gridItem : styles.rowItem]}
-    >
-      <Checkbox
-        value={selectedFiles.includes(item.id)}
-        onValueChange={() => toggleSelection(item.id, item.type)}
-        color={selectedFiles.includes(item.id) ? '#5A42F5' : undefined}
+    <View style={[isGridView ? styles.gridItem : styles.rowItem]}>
+      {/* Checkbox area - now properly separated */}
+      <View style={styles.checkboxContainer}>
+        <Checkbox
+          value={selectedFiles.includes(item.id)}
+          onValueChange={() => toggleSelection(item.id, item.type)}
+          color={selectedFiles.includes(item.id) ? '#5A42F5' : undefined}
+          disabled={item.type !== 'file'}
+        />
+      </View>
+      
+      {/* File icon */}
+      <Ionicons 
+        name={item.icon} 
+        size={28} 
+        color={item.type === 'label' ? '#FF6B6B' : '#4C8CFF'} 
+        style={styles.fileIcon} 
       />
-      <Ionicons name={item.icon} size={28} color={item.type === 'label' ? '#FF6B6B' : '#4C8CFF'} style={styles.fileIcon} />
-      <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>{item.name}</ThemedText>
-      {!isGridView && <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>}
-      {isGridView && <View style={styles.thumbnail} />}
-      {isGridView && <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>}
-      <Ionicons name="ellipsis-vertical" size={20} color="#FFFFFF" style={styles.menuIcon} />
-    </TouchableOpacity>
+      
+      {/* File name and timestamp - clickable area */}
+      <TouchableOpacity 
+        style={styles.fileInfoContainer}
+        onPress={() => {
+          if (item.type === 'file') {
+            handleFilePreview(item);
+          }
+        }}
+        disabled={item.type !== 'file'}
+      >
+        <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>
+          {item.name}
+        </ThemedText>
+      </TouchableOpacity>
+      
+      {/* Timestamp - now properly aligned to the right */}
+      {!isGridView && (
+        <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>
+      )}
+      
+      {/* Options menu */}
+      <TouchableOpacity 
+        style={styles.menuIconContainer}
+        onPress={() => handleOptionsMenu(item)}
+      >
+        <Ionicons name="ellipsis-vertical" size={20} color="#000000" />
+      </TouchableOpacity>
+      
+      {/* Grid-specific layout adjustments */}
+      {isGridView && (
+        <View style={styles.gridBottomSection}>
+          <View style={styles.thumbnail} />
+          <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>
+        </View>
+      )}
+    </View>
   );
 
   return (
@@ -206,7 +248,7 @@ function HomeScreen({ navigation }) {
       {selectedFiles.length > 0 && (
         <TouchableOpacity style={styles.tagButton} onPress={() => setModalVisible(true)}>
           <Ionicons name="pricetag-outline" size={20} color="#FFFFFF" />
-          <ThemedText> Create Label</ThemedText>
+          <ThemedText style={styles.tagButtonText}> Create Label</ThemedText>
         </TouchableOpacity>
       )}
       
@@ -315,6 +357,18 @@ function HomeScreen({ navigation }) {
           </View>
         </BlurView>
       </Modal>
+      
+      {/* Selection indicator */}
+      {selectedFiles.length > 0 && (
+        <View style={styles.selectionIndicator}>
+          <ThemedText style={styles.selectionText}>
+            {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'} selected
+          </ThemedText>
+          <TouchableOpacity onPress={() => setSelectedFiles([])}>
+            <ThemedText style={styles.clearSelectionText}>Clear</ThemedText>
+          </TouchableOpacity>
+        </View>
+      )}
     </ThemedView>
   );
 }
@@ -373,6 +427,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     marginBottom: 12 
   },
+  tagButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
   rowItem: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -384,22 +442,68 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0' 
   },
   gridItem: { 
+    width: '48%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center', 
     backgroundColor: '#F8F8F8', 
     borderRadius: 10, 
     padding: 16, 
     margin: 8, 
-    flexBasis: '48%',
     borderWidth: 1, 
     borderColor: '#E0E0E0' 
   },
+  checkboxContainer: {
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   fileIcon: { marginHorizontal: 10 },
-  fileName: { flex: 1, color: '#000000' },
-  timestamp: { color: '#606060', fontSize: 12 },
-  menuIcon: { marginLeft: 10, color: '#000000' },
+  fileInfoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 5,
+  },
+  fileName: { color: '#000000' },
+  timestamp: { 
+    color: '#606060', 
+    fontSize: 12,
+    marginRight: 10 // Add spacing to separate from the options menu
+  },
+  menuIconContainer: {
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gridBottomSection: {
+    width: '100%',
+    marginTop: 8,
+  },
   thumbnail: { width: 60, height: 60, backgroundColor: '#D1D1F7', marginTop: 8 },
   sidebar: { flex: 1, backgroundColor: '#F8F8F8', padding: 20 },
   listContainer: { marginBottom: 8 },
+  
+  // Selection indicator
+  selectionIndicator: {
+    position: 'absolute',
+    bottom: 80,
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(58, 111, 247, 0.9)',
+    padding: 10,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  selectionText: {
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
+  clearSelectionText: {
+    color: '#FFFFFF',
+    textDecorationLine: 'underline',
+  },
   
   // Upload button (FAB) styles
   uploadButton: {
