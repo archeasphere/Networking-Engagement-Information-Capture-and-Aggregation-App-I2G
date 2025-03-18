@@ -23,50 +23,43 @@ const GraphVisualization = () => {
     { id: 'l3', name: 'Project', type: 'label', color: '#FFD166' }
   ];
   
-  // Calculate positions in a force-directed layout
+  // Calculate positions with items centered on the page
   useEffect(() => {
-    // Create nodes
-    const labelNodes = labels.map((label, index) => ({
-      id: label.id,
-      x: Math.cos(index * (2 * Math.PI / labels.length)) * 120 + 150,
-      y: Math.sin(index * (2 * Math.PI / labels.length)) * 120 + 150,
-      radius: 30,
-      data: label
-    }));
+    const containerWidth = 300; // Approximate width of the container
+    const containerHeight = 300; // Height of the graph container
+    const centerX = containerWidth / 2;
+    const centerY = containerHeight / 2;
+    const webRadius = 100; // Radius of the outer circle
     
-    // Position files in clusters around their labels
+    // Position files in the center with a small circle
     const fileNodes = files.map((file, index) => {
-      // Calculate average position based on connected labels
-      const connectedLabels = file.labels.map(labelId => 
-        labelNodes.find(node => node.id === labelId)
-      ).filter(Boolean);
-      
-      let avgX = 0, avgY = 0;
-      
-      if (connectedLabels.length > 0) {
-        avgX = connectedLabels.reduce((sum, node) => sum + node.x, 0) / connectedLabels.length;
-        avgY = connectedLabels.reduce((sum, node) => sum + node.y, 0) / connectedLabels.length;
-      } else {
-        // If no labels, place in the center with some randomness
-        avgX = 150 + (Math.random() * 50 - 25);
-        avgY = 150 + (Math.random() * 50 - 25);
-      }
-      
-      // Add some randomness to avoid exact overlaps
-      const randOffsetX = Math.random() * 40 - 20;
-      const randOffsetY = Math.random() * 40 - 20;
+      const angle = index * (2 * Math.PI / files.length);
+      const radius = 60; // Smaller inner circle for files
       
       return {
         id: file.id,
-        x: avgX + randOffsetX,
-        y: avgY + randOffsetY,
-        radius: 20,
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
+        radius: 25,
         data: file
       };
     });
     
+    // Position labels in an outer circle
+    const labelNodes = labels.map((label, index) => {
+      const angle = index * (2 * Math.PI / labels.length);
+      
+      return {
+        id: label.id,
+        x: centerX + Math.cos(angle) * webRadius,
+        y: centerY + Math.sin(angle) * webRadius,
+        radius: 30,
+        data: label
+      };
+    });
+    
     // Combine all nodes
-    setNodes([...labelNodes, ...fileNodes]);
+    setNodes([...fileNodes, ...labelNodes]);
     
     // Create edges between files and their labels
     const connectionEdges = [];
@@ -117,7 +110,6 @@ const GraphVisualization = () => {
                   height: Math.abs(targetNode.y - sourceNode.y),
                   backgroundColor: 'transparent',
                 },
-                isHighlighted && styles.highlightedEdge
               ]}
             >
               <View
@@ -201,7 +193,7 @@ const GraphVisualization = () => {
         })}
       </View>
       
-      {/* Info panel for selected node */}
+      {/* Only show info panel for selected node */}
       {selectedNode && (
         <View style={styles.infoPanel}>
           <ThemedText style={styles.infoPanelTitle}>
@@ -243,17 +235,7 @@ const GraphVisualization = () => {
         </View>
       )}
       
-      <View style={styles.legend}>
-        <ThemedText style={styles.legendTitle}>Legend:</ThemedText>
-        {labels.map(label => (
-          <View key={label.id} style={styles.legendItem}>
-            <View 
-              style={[styles.legendColorDot, { backgroundColor: label.color }]} 
-            />
-            <ThemedText style={styles.legendText}>{label.name}</ThemedText>
-          </View>
-        ))}
-      </View>
+      {/* Removed the legend section as requested */}
     </ThemedView>
   );
 };
@@ -285,11 +267,9 @@ const styles = StyleSheet.create({
     overflow: 'visible'
   },
   line: {
-    height: 1,
+    height: 2,
     position: 'absolute',
-    transformOrigin: 'left center'
-  },
-  highlightedEdge: {
+    transformOrigin: 'left center',
     zIndex: 1
   },
   node: {
@@ -364,35 +344,6 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     marginRight: 6
-  },
-  legend: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#F8F8F8',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E0E0E0'
-  },
-  legendTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333333'
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6
-  },
-  legendColorDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 8
-  },
-  legendText: {
-    fontSize: 12,
-    color: '#666666'
   }
 });
 

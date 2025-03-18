@@ -1,5 +1,5 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { StyleSheet, FlatList, TouchableOpacity, View, TextInput } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useState } from 'react';
@@ -7,23 +7,32 @@ import { Ionicons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import TagModal from './TagModal';
 import LoginScreen from './login';
-import SidebarContent from './SidebarContent'; // Import SidebarContent
+import SidebarContent from './SidebarContent';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
+import { BlurView } from 'expo-blur'; // Import BlurView for the blurred background
 
 const Drawer = createDrawerNavigator();
 
 const initialFiles = [
-  { id: '1', name: 'Project Docs.pdf', timestamp: new Date('2025-02-19T00:00:00Z').toUTCString(), icon: 'document-text-outline', type: 'file' },
-  { id: '2', name: 'Design Mockups.png', timestamp: new Date('2025-02-18T00:00:00Z').toUTCString(), icon: 'image-outline', type: 'file' },
-  { id: '3', name: 'App Code.zip', timestamp: new Date('2025-02-15T00:00:00Z').toUTCString(), icon: 'file-tray-outline', type: 'file' },
-  { id: '4', name: 'Meeting Notes.txt', timestamp: new Date('2025-02-10T00:00:00Z').toUTCString(), icon: 'document-outline', type: 'file' },
+  { id: '1', name: 'Project Docs.pdf', timestamp: new Date('2025-02-19T00:00:00Z').toUTCString(), icon: 'document-text-outline', type: 'file', contentType: 'pdf' },
+  { id: '2', name: 'Design Mockups.png', timestamp: new Date('2025-02-18T00:00:00Z').toUTCString(), icon: 'image-outline', type: 'file', contentType: 'image' },
+  { id: '3', name: 'App Code.zip', timestamp: new Date('2025-02-15T00:00:00Z').toUTCString(), icon: 'file-tray-outline', type: 'file', contentType: 'archive' },
+  { id: '4', name: 'Meeting Notes.txt', timestamp: new Date('2025-02-10T00:00:00Z').toUTCString(), icon: 'document-outline', type: 'file', contentType: 'text' },
 ];
 
 const initialLabels = [
   { id: 'l1', name: 'Important', timestamp: new Date('2025-02-20T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'label' },
   { id: 'l2', name: 'Work', timestamp: new Date('2025-02-17T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'label' },
 ];
+
+// Sample file content for preview
+const sampleContent = {
+  text: "Meeting Notes\n\nDate: February 10, 2025\nAttendees: John, Sarah, Mike, Lisa\n\nAgenda:\n1. Project status update\n2. Budget review\n3. Timeline adjustment\n\nAction Items:\n- John to complete frontend by Feb 15\n- Sarah to finalize designs by Feb 12\n- Mike to update documentation\n- Lisa to coordinate with clients",
+  pdf: "Document preview not available. This would display the PDF content in a real implementation.",
+  image: "https://via.placeholder.com/800x600",
+  archive: "Archive contents: \n- index.html\n- styles.css\n- script.js\n- images/\n  - logo.png\n  - header.jpg\n- README.md"
+};
 
 function HomeScreen({ navigation }) {
   const [isGridView, setIsGridView] = useState(false);
@@ -33,6 +42,9 @@ function HomeScreen({ navigation }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newTagName, setNewTagName] = useState('');
+  const [uploadModalVisible, setUploadModalVisible] = useState(false);
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
+  const [previewFile, setPreviewFile] = useState(null);
 
   const filteredFiles = files.filter((file) =>
     file.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -66,8 +78,104 @@ function HomeScreen({ navigation }) {
     }
   };
 
+  // Handler for adding a new file
+  const handleFileUpload = (fileName = "Uploaded File.pdf") => {
+    // Determine the file icon and content type based on extension
+    const extension = fileName.split('.').pop().toLowerCase();
+    let icon = 'document-outline';
+    let contentType = 'text';
+    
+    // Set icon and content type based on file extension
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(extension)) {
+      icon = 'image-outline';
+      contentType = 'image';
+    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
+      icon = 'file-tray-outline';
+      contentType = 'archive';
+    } else if (['pdf'].includes(extension)) {
+      icon = 'document-text-outline';
+      contentType = 'pdf';
+    } else if (['xls', 'xlsx', 'csv'].includes(extension)) {
+      icon = 'grid-outline';
+      contentType = 'spreadsheet';
+    } else if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
+      icon = 'document-outline';
+      contentType = 'text';
+    }
+    
+    const newFile = {
+      id: Date.now().toString(),
+      name: fileName,
+      timestamp: new Date().toUTCString(),
+      icon: icon,
+      type: 'file',
+      contentType: contentType
+    };
+    
+    setFiles([...files, newFile]);
+    setUploadModalVisible(false);
+  };
+
+  // Handler for previewing a file
+  const handleFilePreview = (file) => {
+    setPreviewFile(file);
+    setPreviewModalVisible(true);
+  };
+
+  // Render the file preview content based on file type
+  const renderPreviewContent = () => {
+    if (!previewFile) return null;
+    
+    switch (previewFile.contentType) {
+      case 'image':
+        return (
+          <View style={styles.previewContent}>
+            <Image 
+              source={{ uri: sampleContent.image }} 
+              style={styles.imagePreview} 
+              resizeMode="contain"
+            />
+          </View>
+        );
+      case 'pdf':
+        return (
+          <View style={styles.previewContent}>
+            <Ionicons name="document-text" size={64} color="#E74C3C" />
+            <ThemedText style={styles.previewText}>{sampleContent.pdf}</ThemedText>
+          </View>
+        );
+      case 'text':
+        return (
+          <View style={styles.previewContent}>
+            <ThemedText style={styles.previewText}>{sampleContent.text}</ThemedText>
+          </View>
+        );
+      case 'archive':
+        return (
+          <View style={styles.previewContent}>
+            <Ionicons name="file-tray" size={64} color="#F39C12" />
+            <ThemedText style={styles.previewText}>{sampleContent.archive}</ThemedText>
+          </View>
+        );
+      default:
+        return (
+          <View style={styles.previewContent}>
+            <Ionicons name="document" size={64} color="#3498DB" />
+            <ThemedText style={styles.previewText}>Preview not available for this file type</ThemedText>
+          </View>
+        );
+    }
+  };
+
   const renderItem = ({ item }) => (
-    <View style={[isGridView ? styles.gridItem : styles.rowItem]}>
+    <TouchableOpacity
+      onPress={() => {
+        if (item.type === 'file') {
+          handleFilePreview(item);
+        }
+      }}
+      style={[isGridView ? styles.gridItem : styles.rowItem]}
+    >
       <Checkbox
         value={selectedFiles.includes(item.id)}
         onValueChange={() => toggleSelection(item.id, item.type)}
@@ -79,7 +187,7 @@ function HomeScreen({ navigation }) {
       {isGridView && <View style={styles.thumbnail} />}
       {isGridView && <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>}
       <Ionicons name="ellipsis-vertical" size={20} color="#FFFFFF" style={styles.menuIcon} />
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -133,6 +241,15 @@ function HomeScreen({ navigation }) {
         style={styles.listContainer}
       />
       
+      {/* Upload Button (FAB) */}
+      <TouchableOpacity
+        style={styles.uploadButton}
+        onPress={() => setUploadModalVisible(true)}
+      >
+        <Ionicons name="cloud-upload-outline" size={24} color="#FFFFFF" />
+      </TouchableOpacity>
+      
+      {/* Tag Modal */}
       <TagModal
         visible={modalVisible}
         TagName={newTagName}
@@ -140,6 +257,64 @@ function HomeScreen({ navigation }) {
         onCancel={() => setModalVisible(false)}
         onConfirm={confirmCreateTag}
       />
+      
+      {/* Upload Files Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={uploadModalVisible}
+        onRequestClose={() => setUploadModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <ThemedText style={styles.modalTitle}>Upload File</ThemedText>
+            
+            {/* Drag and drop area */}
+            <View style={styles.uploadDropArea}>
+              <Ionicons name="cloud-upload-outline" size={48} color="#B0B0B0" />
+              <ThemedText style={styles.dropText}>Drop your file here</ThemedText>
+              <TouchableOpacity 
+                style={styles.clickToUpload}
+                onPress={() => handleFileUpload("MyFile.pdf")}
+              >
+                <ThemedText style={styles.clickToUploadText}>or click here to upload</ThemedText>
+              </TouchableOpacity>
+            </View>
+            
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setUploadModalVisible(false)}
+            >
+              <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      
+      {/* File Preview Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={previewModalVisible}
+        onRequestClose={() => setPreviewModalVisible(false)}
+      >
+        <BlurView intensity={60} style={styles.blurContainer}>
+          <View style={styles.previewModalView}>
+            {/* File preview header */}
+            <View style={styles.previewHeader}>
+              <ThemedText style={styles.previewTitle}>
+                {previewFile?.name || "File Preview"}
+              </ThemedText>
+              <TouchableOpacity onPress={() => setPreviewModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#000000" />
+              </TouchableOpacity>
+            </View>
+            
+            {/* File preview content */}
+            {renderPreviewContent()}
+          </View>
+        </BlurView>
+      </Modal>
     </ThemedView>
   );
 }
@@ -153,16 +328,13 @@ export default function AppNavigator() {
         drawerLabelStyle: { color: '#000000' },
         headerStyle: { backgroundColor: '#FFFFFF' },
         headerTitleStyle: { color: '#000000' },
-        headerTintColor: '#000000', // Ensures top-left icon is black
+        headerTintColor: '#000000',
       }}
     > 
       <Drawer.Screen name="Home" component={HomeScreen} />
     </Drawer.Navigator>
   );
 }
-
-
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF', padding: 16 },
@@ -188,7 +360,7 @@ const styles = StyleSheet.create({
     paddingTop: 16
   },
   titleText: { 
-    color: '#333333', // Darker gray for better contrast in light mode
+    color: '#333333',
     fontSize: 24, 
     fontWeight: 'bold' 
   },  
@@ -228,4 +400,134 @@ const styles = StyleSheet.create({
   thumbnail: { width: 60, height: 60, backgroundColor: '#D1D1F7', marginTop: 8 },
   sidebar: { flex: 1, backgroundColor: '#F8F8F8', padding: 20 },
   listContainer: { marginBottom: 8 },
+  
+  // Upload button (FAB) styles
+  uploadButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    backgroundColor: '#3A6FF7',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  
+  // Modal styles
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333333',
+  },
+  cancelButton: {
+    marginTop: 20,
+    padding: 10,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    color: '#3A6FF7',
+    fontWeight: '500',
+  },
+  
+  // Drag and drop area styles
+  uploadDropArea: {
+    width: '100%',
+    height: 200,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+    borderStyle: 'dashed',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F8F8',
+  },
+  dropText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#808080',
+  },
+  clickToUpload: {
+    marginTop: 16,
+  },
+  clickToUploadText: {
+    color: '#3A6FF7',
+    fontSize: 16,
+    textDecorationLine: 'underline',
+  },
+  
+  // File preview modal styles
+  blurContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.2)', // Additional tint for the blur effect
+  },
+  previewModalView: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    paddingBottom: 12,
+  },
+  previewTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333333',
+  },
+  previewContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  imagePreview: {
+    width: '100%',
+    height: 400,
+    borderRadius: 8,
+  },
+  previewText: {
+    marginTop: 16,
+    fontSize: 14,
+    color: '#333333',
+    lineHeight: 20,
+  },
 });
