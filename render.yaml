@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: connecttech  # ✅ Your backend API service name
+    runtime: node  # ✅ Node.js for Express API
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: Backend  # ✅ Connect to existing PostgreSQL database
+          property: connectionString
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
