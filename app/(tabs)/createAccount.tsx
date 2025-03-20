@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function CreateAccountScreen() {
@@ -16,7 +16,7 @@ export default function CreateAccountScreen() {
         <Text style={{ color: '#121212', fontSize: 16, fontWeight: 'bold' }}>Create Account</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+      <TouchableOpacity onPress={() => navigation.navigate('login')}>
         <Text style={{ color: '#FFD700' }}>Already have an account? Sign In</Text>
       </TouchableOpacity>
     </View>
