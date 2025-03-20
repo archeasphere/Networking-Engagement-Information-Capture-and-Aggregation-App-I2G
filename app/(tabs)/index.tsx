@@ -12,6 +12,8 @@ import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
 
+const API_URL = "https://backend-service-ndyt.onrender.com";
+
 const Drawer = createDrawerNavigator();
 
 const initialFiles = [
@@ -19,11 +21,6 @@ const initialFiles = [
   { id: '2', name: 'Design Mockups.png', timestamp: new Date('2025-02-18T00:00:00Z').toUTCString(), icon: 'image-outline', type: 'file', contentType: 'image' },
   { id: '3', name: 'App Code.zip', timestamp: new Date('2025-02-15T00:00:00Z').toUTCString(), icon: 'file-tray-outline', type: 'file', contentType: 'archive' },
   { id: '4', name: 'Meeting Notes.txt', timestamp: new Date('2025-02-10T00:00:00Z').toUTCString(), icon: 'document-outline', type: 'file', contentType: 'text' },
-];
-
-const initialLabels = [
-  { id: 'l1', name: 'Important', timestamp: new Date('2025-02-20T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'label' },
-  { id: 'l2', name: 'Work', timestamp: new Date('2025-02-17T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'label' },
 ];
 
 // Sample file content for preview
@@ -38,7 +35,6 @@ function HomeScreen({ navigation }) {
   const [isGridView, setIsGridView] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [files, setFiles] = useState(initialFiles);
-  const [labels, setLabels] = useState(initialLabels);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newTagName, setNewTagName] = useState('');
@@ -47,12 +43,9 @@ function HomeScreen({ navigation }) {
   const [previewFile, setPreviewFile] = useState(null);
   const [showDropdownFor, setShowDropdownFor] = useState(null); // ID of the file for which dropdown is visible
 
-  const filteredFiles = files.filter((file) =>
-    file.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const filteredLabels = labels.filter((label) =>
-    label.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filter all items (files and labels combined) based on search query
+  const filteredItems = files.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const toggleSelection = (id, type) => {
@@ -72,7 +65,7 @@ function HomeScreen({ navigation }) {
         icon: 'pricetag-outline',
         type: 'label'
       };
-      setLabels((prevLabels) => [...prevLabels, newTag]);
+      setFiles((prevFiles) => [...prevFiles, newTag]);
       setSelectedFiles([]);
       setModalVisible(false);
       setNewTagName('');
@@ -228,11 +221,11 @@ function HomeScreen({ navigation }) {
   const renderDropdownMenus = () => {
     if (!showDropdownFor) return null;
     
-    const file = [...files, ...labels].find(item => item.id === showDropdownFor);
+    const file = files.find(item => item.id === showDropdownFor);
     if (!file || file.type !== 'file') return null;
     
     // Find the position of the file item in the list
-    const fileIndex = filteredFiles.findIndex(item => item.id === showDropdownFor);
+    const fileIndex = filteredItems.findIndex(item => item.id === showDropdownFor);
     if (fileIndex === -1) return null;
     
     // Calculate the position of the dropdown
@@ -359,31 +352,17 @@ function HomeScreen({ navigation }) {
           </TouchableOpacity>
         )}
         
-        {/* Files Section */}
+        {/* Combined Files and Labels Section */}
         <View style={styles.header}>
-          <ThemedText style={styles.titleText}>My Files</ThemedText>
+          <ThemedText style={styles.titleText}>My Files & Labels</ThemedText>
           <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
             <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
           </TouchableOpacity>
         </View>
         
         <FlatList
-          data={filteredFiles}
-          key={isGridView ? 'grid-files' : 'list-files'}
-          numColumns={isGridView ? 2 : 1}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={styles.listContainer}
-        />
-        
-        {/* Labels Section */}
-        <View style={[styles.header, styles.labelsHeader]}>
-          <ThemedText style={styles.titleText}>Labels</ThemedText>
-        </View>
-        
-        <FlatList
-          data={filteredLabels}
-          key={isGridView ? 'grid-labels' : 'list-labels'}
+          data={filteredItems}
+          key={isGridView ? 'grid-items' : 'list-items'}
           numColumns={isGridView ? 2 : 1}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}

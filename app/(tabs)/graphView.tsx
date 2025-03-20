@@ -23,61 +23,64 @@ const GraphVisualization = () => {
     { id: 'l3', name: 'Project', type: 'label', color: '#FFD166' }
   ];
   
-  // Calculate positions with items centered on the page
+  // Selected file (first file by default)
+  const centralFile = files[0];
+  
+  // Calculate node positions with central file and radiating labels
   useEffect(() => {
-    const containerWidth = 300; // Approximate width of the container
+    const windowWidth = Dimensions.get('window').width;
+    const containerWidth = windowWidth - 32; // Accounting for container padding
     const containerHeight = 300; // Height of the graph container
     const centerX = containerWidth / 2;
     const centerY = containerHeight / 2;
-    const webRadius = 100; // Radius of the outer circle
+    const radius = Math.min(centerX, centerY) - 50; // Safe radius for label nodes
     
-    // Position files in the center with a small circle
-    const fileNodes = files.map((file, index) => {
-      const angle = index * (2 * Math.PI / files.length);
-      const radius = 60; // Smaller inner circle for files
-      
-      return {
-        id: file.id,
-        x: centerX + Math.cos(angle) * radius,
-        y: centerY + Math.sin(angle) * radius,
-        radius: 25,
-        data: file
-      };
-    });
+    // Create central file node
+    const fileNode = {
+      id: centralFile.id,
+      x: centerX,
+      y: centerY,
+      radius: 35, // Slightly larger central node
+      data: centralFile
+    };
     
-    // Position labels in an outer circle
-    const labelNodes = labels.map((label, index) => {
-      const angle = index * (2 * Math.PI / labels.length);
+    // Get only the labels related to this file
+    const relatedLabelIds = centralFile.labels;
+    const relatedLabels = labels.filter(label => relatedLabelIds.includes(label.id));
+    
+    // Position labels in a circle around the central file
+    const labelNodes = relatedLabels.map((label, index) => {
+      const angle = index * (2 * Math.PI / relatedLabels.length);
       
       return {
         id: label.id,
-        x: centerX + Math.cos(angle) * webRadius,
-        y: centerY + Math.sin(angle) * webRadius,
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
         radius: 30,
         data: label
       };
     });
     
-    // Combine all nodes
-    setNodes([...fileNodes, ...labelNodes]);
+    // Combine central file node with label nodes
+    setNodes([fileNode, ...labelNodes]);
     
-    // Create edges between files and their labels
-    const connectionEdges = [];
-    files.forEach(file => {
-      file.labels.forEach(labelId => {
-        connectionEdges.push({
-          id: `${file.id}-${labelId}`,
-          source: file.id,
-          target: labelId
-        });
-      });
-    });
+    // Create edges between the central file and its labels
+    const connectionEdges = relatedLabelIds.map(labelId => ({
+      id: `${centralFile.id}-${labelId}`,
+      source: centralFile.id,
+      target: labelId
+    }));
     
     setEdges(connectionEdges);
   }, []);
   
   const handleNodePress = (node) => {
     setSelectedNode(selectedNode?.id === node.id ? null : node);
+  };
+  
+  // Find files related to a label
+  const getFilesForLabel = (labelId) => {
+    return files.filter(file => file.labels.includes(labelId));
   };
   
   return (
@@ -87,12 +90,33 @@ const GraphVisualization = () => {
       </View>
       
       <View style={styles.graphContainer}>
-        {/* Draw edges first so they appear behind nodes */}
+        {/* Draw edges with improved alignment */}
         {edges.map(edge => {
           const sourceNode = nodes.find(node => node.id === edge.source);
           const targetNode = nodes.find(node => node.id === edge.target);
           
           if (!sourceNode || !targetNode) return null;
+          
+          // Calculate line endpoints using node positions and radii
+          const dx = targetNode.x - sourceNode.x;
+          const dy = targetNode.y - sourceNode.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Unit vector for direction
+          const ux = dx / distance;
+          const uy = dy / distance;
+          
+          // Adjust start and end points to be at the node boundaries
+          const startX = sourceNode.x + (ux * sourceNode.radius);
+          const startY = sourceNode.y + (uy * sourceNode.radius);
+          const endX = targetNode.x - (ux * targetNode.radius);
+          const endY = targetNode.y - (uy * targetNode.radius);
+          
+          // Recalculate adjusted distance for the line
+          const adjustedDx = endX - startX;
+          const adjustedDy = endY - startY;
+          const adjustedDistance = Math.sqrt(adjustedDx * adjustedDx + adjustedDy * adjustedDy);
+          const angle = Math.atan2(adjustedDy, adjustedDx);
           
           // Highlight edges connected to the selected node
           const isHighlighted = selectedNode && 
@@ -104,35 +128,18 @@ const GraphVisualization = () => {
               style={[
                 styles.edge,
                 {
-                  left: Math.min(sourceNode.x, targetNode.x),
-                  top: Math.min(sourceNode.y, targetNode.y),
-                  width: Math.abs(targetNode.x - sourceNode.x),
-                  height: Math.abs(targetNode.y - sourceNode.y),
-                  backgroundColor: 'transparent',
+                  left: startX,
+                  top: startY,
+                  width: adjustedDistance,
+                  height: 2, // Line thickness
+                  transform: [{ rotate: `${angle}rad` }],
+                  backgroundColor: isHighlighted ? '#3A6FF7' : '#D0D0D0',
+                  zIndex: 1,
+                  position: 'absolute',
+                  transformOrigin: '0 0',
                 },
               ]}
-            >
-              <View
-                style={[
-                  styles.line,
-                  {
-                    width: Math.sqrt(
-                      Math.pow(targetNode.x - sourceNode.x, 2) + 
-                      Math.pow(targetNode.y - sourceNode.y, 2)
-                    ),
-                    transform: [
-                      {
-                        rotate: `${Math.atan2(
-                          targetNode.y - sourceNode.y,
-                          targetNode.x - sourceNode.x
-                        )}rad`,
-                      },
-                    ],
-                    backgroundColor: isHighlighted ? '#3A6FF7' : '#D0D0D0',
-                  },
-                ]}
-              />
-            </View>
+            />
           );
         })}
         
@@ -163,7 +170,9 @@ const GraphVisualization = () => {
                   borderWidth: isHighlighted ? 2 : 1,
                 },
                 isLabel && styles.labelNode,
-                node.id === selectedNode?.id && styles.selectedNode
+                node.id === selectedNode?.id && styles.selectedNode,
+                // Central file node is larger
+                !isLabel && styles.fileNode
               ]}
               onPress={() => handleNodePress(node)}
             >
@@ -172,7 +181,7 @@ const GraphVisualization = () => {
               ) : (
                 <Ionicons 
                   name="document-outline" 
-                  size={16} 
+                  size={20} 
                   color={isHighlighted ? '#3A6FF7' : '#707070'} 
                 />
               )}
@@ -180,12 +189,13 @@ const GraphVisualization = () => {
                 style={[
                   styles.nodeText, 
                   isLabel && styles.labelText,
-                  isHighlighted && !isLabel && styles.highlightedText
+                  isHighlighted && !isLabel && styles.highlightedText,
+                  !isLabel && styles.fileNodeText
                 ]}
                 numberOfLines={1}
               >
-                {node.data.name.length > 10 
-                  ? node.data.name.substring(0, 8) + '...' 
+                {isLabel ? node.data.name : node.data.name.length > 12 
+                  ? node.data.name.substring(0, 10) + '...' 
                   : node.data.name}
               </ThemedText>
             </TouchableOpacity>
@@ -193,7 +203,7 @@ const GraphVisualization = () => {
         })}
       </View>
       
-      {/* Only show info panel for selected node */}
+      {/* Info panel for selected node */}
       {selectedNode && (
         <View style={styles.infoPanel}>
           <ThemedText style={styles.infoPanelTitle}>
@@ -203,13 +213,11 @@ const GraphVisualization = () => {
           {selectedNode.data.type === 'label' ? (
             <View>
               <ThemedText style={styles.infoPanelSubtitle}>Connected Files:</ThemedText>
-              {files
-                .filter(file => file.labels.includes(selectedNode.id))
-                .map(file => (
-                  <ThemedText key={file.id} style={styles.infoPanelItem}>
-                    • {file.name}
-                  </ThemedText>
-                ))}
+              {getFilesForLabel(selectedNode.id).map(file => (
+                <ThemedText key={file.id} style={styles.infoPanelItem}>
+                  • {file.name}
+                </ThemedText>
+              ))}
             </View>
           ) : (
             <View>
@@ -234,8 +242,6 @@ const GraphVisualization = () => {
           )}
         </View>
       )}
-      
-      {/* Removed the legend section as requested */}
     </ThemedView>
   );
 };
@@ -264,13 +270,8 @@ const styles = StyleSheet.create({
   },
   edge: {
     position: 'absolute',
-    overflow: 'visible'
-  },
-  line: {
     height: 2,
-    position: 'absolute',
-    transformOrigin: 'left center',
-    zIndex: 1
+    backgroundColor: '#D0D0D0',
   },
   node: {
     position: 'absolute',
@@ -290,6 +291,12 @@ const styles = StyleSheet.create({
   labelNode: {
     borderWidth: 0
   },
+  fileNode: {
+    zIndex: 3,
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3
+  },
   selectedNode: {
     borderWidth: 2,
     borderColor: '#3A6FF7',
@@ -301,6 +308,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#333333',
     marginTop: 2
+  },
+  fileNodeText: {
+    fontSize: 12,
+    fontWeight: '500'
   },
   labelText: {
     color: '#FFFFFF',
