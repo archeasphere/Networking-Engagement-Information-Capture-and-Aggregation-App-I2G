@@ -9,7 +9,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "server": "node server.js",
+    "dev": "nodemon server.js"
   },
   "jest": {
     "preset": "jest-expo"
@@ -22,6 +24,7 @@
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
     "axios": "^1.8.3",
+    "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -39,6 +42,8 @@
     "expo-system-ui": "~4.0.8",
     "expo-web-browser": "~14.0.2",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mock-aws-s3": "^4.0.2",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.14.0",
     "react": "18.3.1",
@@ -60,6 +65,7 @@
     "@types/react-test-renderer": "^18.3.0",
     "jest": "^29.2.1",
     "jest-expo": "~52.0.4",
+    "nodemon": "^3.1.9",
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
   },

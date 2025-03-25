@@ -1,27 +1,25 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors"); // ✅ Added CORS for frontend connection
-const { Pool } = require("pg");
+const cors = require("cors");
 const multer = require("multer");
-const cloudinary = require("./cloudinaryConfig"); // Import Cloudinary config
+const cloudinary = require("./cloudinaryConfig");
 const streamifier = require("streamifier");
+const pool = require('./db');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const authroutes = require('./app/routes/auth');  // ✅ Correct import path
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
-// ✅ Enable CORS to allow frontend to access the API
+// Enable CORS to allow frontend to access the API
 app.use(cors());
-app.use(express.json()); // ✅ Support JSON requests
+app.use(express.json()); // Support JSON requests
 
-// ✅ Database Connection Setup
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false  // Required for Render-hosted databases
-    }
-});
+app.use('/auth', authroutes);
 
-// ✅ Test Route to Check Database Connection
+// Test Route to Check Database Connection
 app.get('/test-db', async (req, res) => {
     try {
         const result = await pool.query('SELECT NOW() AS current_time'); // Simple test query
@@ -32,12 +30,12 @@ app.get('/test-db', async (req, res) => {
     }
 });
 
-// ✅ Test Route to Check Server & Cloudinary Connection
+// Test Route to Check Server & Cloudinary Connection
 app.get("/", (req, res) => {
     res.send("🚀 Cloudinary & Database API is running!");
 });
 
-// ✅ Upload Route (Handles File Uploads to Cloudinary)
+// Upload Route (Handles File Uploads to Cloudinary)
 const upload = multer();
 app.post("/upload", upload.single("file"), (req, res) => {
     if (!req.file) {
@@ -57,7 +55,65 @@ app.post("/upload", upload.single("file"), (req, res) => {
     streamifier.createReadStream(req.file.buffer).pipe(stream);
 });
 
-// ✅ API Route to Fetch All Uploaded Files from Database
+// Endpoint to create a new account
+app.post('/create-account', async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+        return res.status(400).json({ error: 'Username, email, and password are required' });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const result = await pool.query(
+            'INSERT INTO users (username, email, password_hash, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id, username, email, created_at',
+            [username, email, hashedPassword]
+        );
+
+        res.status(201).json({ message: 'Account created successfully', user: result.rows[0] });
+
+    } catch (error) {
+        console.error('Error creating account:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Endpoint to login
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    try {
+        // Retrieve the user from the database
+        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid email or password' });
+        }
+
+        // Compare the password with the hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid email or password' });
+        }
+
+        // Generate a JWT
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.json({ token });
+    } catch (error) {
+        console.error('Error logging in:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API Route to Fetch All Uploaded Files from Database
 app.get("/files", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM files ORDER BY uploaded_at DESC;");
@@ -68,7 +124,7 @@ app.get("/files", async (req, res) => {
     }
 });
 
-// ✅ Route to Save Uploaded File Info to Database
+// Route to Save Uploaded File Info to Database
 app.post("/save-file", async (req, res) => {
     const { file_url, file_name } = req.body;
     if (!file_url || !file_name) {
@@ -87,7 +143,7 @@ app.post("/save-file", async (req, res) => {
     }
 });
 
-// ✅ Start Server (Only Once!)
+// Start Server (Only Once!)
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
