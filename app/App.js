@@ -25,6 +25,8 @@ function App() {
 
     try {
       const response = await postData("/upload", formData, true); // Pass `true` to indicate file upload
+
+
       setUploadedUrl(response.file_url);
       alert("File uploaded successfully!");
     } catch (error) {
