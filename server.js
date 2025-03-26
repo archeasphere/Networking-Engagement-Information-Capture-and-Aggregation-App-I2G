@@ -8,7 +8,7 @@ const pool = require('./db');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const authroutes = require('./app/routes/auth');  // ✅ Correct import path
+//const authroutes = require('./app/routes/auth');  // ✅ Correct import path
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json()); // Support JSON requests
 
-app.use('/auth', authroutes);
+//app.use('/auth', authroutes);
 
 // Test Route to Check Database Connection
 app.get('/test-db', async (req, res) => {
@@ -35,25 +35,50 @@ app.get("/", (req, res) => {
     res.send("🚀 Cloudinary & Database API is running!");
 });
 
+
+const upload = multer(); // ← THIS is what you're missing
+
 // Upload Route (Handles File Uploads to Cloudinary)
-const upload = multer();
-app.post("/upload", upload.single("file"), (req, res) => {
+app.post("/upload", upload.single("file"), async (req, res) => {
+    const userId = 1; // Replace this with the actual authenticated user ID (e.g., from token)
+  
     if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
+      return res.status(400).json({ error: "No file uploaded" });
     }
-
-    // Upload file to Cloudinary
-    let stream = cloudinary.uploader.upload_stream(
-        { resource_type: "auto" },
-        (error, result) => {
-            if (error) return res.status(500).json({ error: error.message });
-
-            res.json({ file_url: result.secure_url });
+  
+    const fileBuffer = req.file.buffer;
+    const originalName = req.file.originalname;
+    const fileType = req.file.mimetype;
+    const fileSize = req.file.size;
+  
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto", folder: "my_project_files" },
+      async (error, result) => {
+        if (error) return res.status(500).json({ error: error.message });
+  
+        try {
+          await pool.query(
+            `INSERT INTO file_metadata (user_id, file_name, file_type, file_size, file_url, uploaded_at)
+             VALUES ($1, $2, $3, $4, $5, NOW());`,
+            [userId, originalName, fileType, fileSize, result.secure_url]
+          );
+  
+          res.json({
+            name: originalName,
+            type: fileType,
+            size: fileSize,
+            url: result.secure_url,
+          });
+        } catch (dbError) {
+          console.error("DB Save Error:", dbError);
+          res.status(500).json({ error: "Failed to save file metadata" });
         }
+      }
     );
-
-    streamifier.createReadStream(req.file.buffer).pipe(stream);
-});
+  
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
+  
 
 // Endpoint to create a new account
 app.post('/create-account', async (req, res) => {

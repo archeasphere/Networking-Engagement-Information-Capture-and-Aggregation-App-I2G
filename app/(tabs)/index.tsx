@@ -11,6 +11,7 @@ import SidebarContent from './SidebarContent';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
+import * as DocumentPicker from 'expo-document-picker';
 
 const API_URL = "https://backend-service-ndyt.onrender.com";
 
@@ -73,41 +74,57 @@ function HomeScreen({ navigation }) {
   };
 
   // Handler for adding a new file
-  const handleFileUpload = (fileName = "Uploaded File.pdf") => {
-    // Determine the file icon and content type based on extension
-    const extension = fileName.split('.').pop().toLowerCase();
-    let icon = 'document-outline';
-    let contentType = 'text';
-    
-    // Set icon and content type based on file extension
-    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(extension)) {
-      icon = 'image-outline';
-      contentType = 'image';
-    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
-      icon = 'file-tray-outline';
-      contentType = 'archive';
-    } else if (['pdf'].includes(extension)) {
-      icon = 'document-text-outline';
-      contentType = 'pdf';
-    } else if (['xls', 'xlsx', 'csv'].includes(extension)) {
-      icon = 'grid-outline';
-      contentType = 'spreadsheet';
-    } else if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
-      icon = 'document-outline';
-      contentType = 'text';
+  const handleFileUpload = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*', // Allow all file types
+        copyToCacheDirectory: true,
+        multiple: false
+      });
+  
+      if (result.canceled) return;
+  
+      const file = result.assets[0]; // The file that was picked
+  
+      // Upload to backend
+      const uploadedData = await uploadToBackend(file);
+  
+      if (uploadedData) {
+        const extension = uploadedData.name.split('.').pop().toLowerCase();
+        let icon = 'document-outline';
+        let contentType = 'unknown';
+  
+        // Icon and type detection (optional)
+        if (['jpg', 'jpeg', 'png'].includes(extension)) {
+          icon = 'image-outline';
+          contentType = 'image';
+        } else if (['pdf'].includes(extension)) {
+          icon = 'document-text-outline';
+          contentType = 'pdf';
+        } else if (['zip'].includes(extension)) {
+          icon = 'file-tray-outline';
+          contentType = 'archive';
+        } else {
+          icon = 'document-outline';
+          contentType = 'text';
+        }
+  
+        const newFile = {
+          id: Date.now().toString(),
+          name: uploadedData.name,
+          uri: uploadedData.url, // the URL from Cloudinary/backend
+          timestamp: new Date().toUTCString(),
+          icon,
+          contentType,
+          type: 'file'
+        };
+  
+        setFiles(prev => [...prev, newFile]);
+        setUploadModalVisible(false);
+      }
+    } catch (error) {
+      console.error("File upload error:", error);
     }
-    
-    const newFile = {
-      id: Date.now().toString(),
-      name: fileName,
-      timestamp: new Date().toUTCString(),
-      icon: icon,
-      type: 'file',
-      contentType: contentType
-    };
-    
-    setFiles([...files, newFile]);
-    setUploadModalVisible(false);
   };
 
   // Handler for opening the file options menu
@@ -217,6 +234,30 @@ function HomeScreen({ navigation }) {
     }
   };
 
+  const uploadToBackend = async (file) => {
+    const formData = new FormData();
+    formData.append("file", {
+      uri: file.uri,
+      name: file.name,
+      type: file.mimeType || "application/octet-stream",
+    });
+  
+    try {
+      const response = await fetch(`${API_URL}/upload`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      const data = await response.json();
+      console.log("File uploaded:", data);
+      return data;
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
   // Render each dropdown menu separately at the root level
   const renderDropdownMenus = () => {
     if (!showDropdownFor) return null;
