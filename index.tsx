@@ -2,7 +2,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import TagModal from './TagModal';
@@ -11,6 +10,7 @@ import SidebarContent from './SidebarContent';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
+import { useState, useEffect, useRef } from 'react';
 
 const Drawer = createDrawerNavigator();
 
@@ -35,10 +35,11 @@ const sampleContent = {
   connection: "This is a connection preview.\n\nDetails:\n- Groups related files or content.\n- Created to organize your workspace.\n- Lists the files URL."
 };
 
-function HomeScreen({ navigation }) {
+function HomeScreen({ }) {
   const [isGridView, setIsGridView] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [files, setFiles] = useState(initialFiles);
+  // const [files, setFiles] = useState(initialFiles);
+  const [files, setFiles] = useState([]);
   const [labels, setLabels] = useState(initialLabels);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -57,6 +58,49 @@ function HomeScreen({ navigation }) {
 
     );
   });
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        console.log("📡 Fetching from backend...");
+        const response = await fetch('https://backend-service-ndyt.onrender.com/api/files/all');
+        const json = await response.json();
+   
+        if (!json.success || !json.data) {
+          throw new Error("Invalid response format");
+        }
+   
+        const formattedFiles = json.data.map((file) => ({
+          id: file.id || Math.random().toString(36).substr(2, 9),
+          name: file.file_name,
+          timestamp: new Date(file.uploaded_at || Date.now()).toUTCString(),
+          icon: getIconForType(file.file_type),
+          type: 'file',
+          contentType: file.file_type
+        }));
+   
+        setFiles(formattedFiles);
+      } catch (error) {
+        console.error('Error fetching files:', error);
+        setFiles([]);
+        Alert.alert('Error', 'Failed to load files from server');
+      }
+    };
+   
+    fetchFiles();
+  }, []);
+
+  // Helper function to determine icon based on content type
+  const getIconForType = (contentType: any) => {
+    switch(contentType) {
+      case 'pdf': return 'document-text-outline';
+      case 'image': return 'image-outline';
+      case 'archive': return 'file-tray-outline';
+      case 'text': return 'document-outline';
+      default: return 'document-outline';
+    }
+  };
+
   
   const filteredLabels = labels.filter((label) => {
     const query = searchQuery.toLowerCase();
@@ -85,7 +129,11 @@ function HomeScreen({ navigation }) {
         name: connectionName, // Use the determined name
         timestamp: new Date().toUTCString(),
         icon: 'pricetag-outline',
-        type: 'connection'
+        type: 'connection',
+        associatedFiles: selectedFiles.map(id => {  // Store the selected file IDs
+          const file = files.find(f => f.id === id);
+          return file ? file.name : id;  // Map to file names, fallback to ID if not found
+        })
       };
       setLabels((prevLabels) => [...prevLabels, newConnection]);
       setSelectedFiles([]);
@@ -239,13 +287,13 @@ function HomeScreen({ navigation }) {
         );
     }
   } else if (previewItem.type === 'connection') {
-      return (
-        <View style={styles.previewContent}>
+    return (
+      <View style={styles.previewContent}>
         <Ionicons name="pricetag-outline" size={64} color="#FF6B6B" />
         <ThemedText style={styles.previewText}>
-          {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\n${sampleContent.connection}`}
+          {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:\n${previewItem.associatedFiles?.join('\n') || 'None'}`}
         </ThemedText>
-      </View>      
+      </View>
       );
     }
   };
@@ -313,8 +361,6 @@ function HomeScreen({ navigation }) {
       
       <Ionicons 
         name={item.icon} 
-        // CHANGE 7: Updated color condition to use 'connection' instead of 'label'
-        // WHY: Matches the type change in 'initialLabels' and 'confirmCreateConnection'
         size={28} 
         color={item.type === 'connection' ? '#FF6B6B' : '#4C8CFF'} 
         style={styles.fileIcon} 
@@ -322,14 +368,11 @@ function HomeScreen({ navigation }) {
       
       <TouchableOpacity 
         style={styles.fileInfoContainer}
-        // CHANGE 8: Simplified onPress to call 'handlePreview' for all items
-        // WHY: Allows clicking any item (file or connection) to show a preview, removing the 'file'-only condition
         onPress={() => handlePreview(item)}
-        // Removed 'disabled' prop to enable clicking for all items
       >
         <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>
           {item.name}
-        </ThemedText>
+        </ThemedText> 
       </TouchableOpacity>
       
       {!isGridView && (
