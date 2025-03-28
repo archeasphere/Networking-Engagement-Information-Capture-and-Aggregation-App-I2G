@@ -1,5 +1,5 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image, Alert } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image, Alert, Linking } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,7 +35,7 @@ const sampleContent = {
   connection: "This is a connection preview.\n\nDetails:\n- Groups related files or content.\n- Created to organize your workspace.\n- Lists the files URL."
 };
 
-function HomeScreen({ }) {
+function HomeScreen({navigation }) {
   const [isGridView, setIsGridView] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   // const [files, setFiles] = useState(initialFiles);
@@ -54,8 +54,8 @@ function HomeScreen({ }) {
     return (
       file.name.toLowerCase().includes(query) ||
       file.timestamp.toLowerCase().includes(query) ||
-      file.type.toLowerCase().includes(query)
-
+      file.type.toLowerCase().includes(query) ||
+      (file.url && file.url.toLowerCase().includes(query))
     );
   });
 
@@ -76,7 +76,9 @@ function HomeScreen({ }) {
           timestamp: new Date(file.uploaded_at || Date.now()).toUTCString(),
           icon: getIconForType(file.file_type),
           type: 'file',
-          contentType: file.file_type
+          contentType: file.file_type,
+          url: file.file_url,
+          size: file.file_size
         }));
    
         setFiles(formattedFiles);
@@ -90,15 +92,60 @@ function HomeScreen({ }) {
     fetchFiles();
   }, []);
 
+
+
   // Helper function to determine icon based on content type
-  const getIconForType = (contentType: any) => {
-    switch(contentType) {
-      case 'pdf': return 'document-text-outline';
-      case 'image': return 'image-outline';
-      case 'archive': return 'file-tray-outline';
-      case 'text': return 'document-outline';
-      default: return 'document-outline';
+  const getIconForType = (contentType) => {
+    // First normalize the content type to lowercase
+    const type = contentType ? contentType.toLowerCase() : 'unknown';
+    
+    // Check for PDF files
+    if (type === 'pdf' || type.includes('application/pdf')) {
+      return 'document-text-outline';
     }
+    
+    // Check for image files
+    if (type === 'image' || 
+        type.includes('image/') ||
+        ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].some(ext => type.includes(ext))) {
+      return 'image-outline';
+    }
+    
+    // Check for archive files
+    if (type === 'archive' || 
+        ['zip', 'rar', '7z', 'tar', 'gz', 'application/zip', 'application/x-rar'].some(ext => type.includes(ext))) {
+      return 'file-tray-outline';
+    }
+    
+    // Check for text files
+    if (type === 'text' || 
+        type.includes('text/') || 
+        ['txt', 'rtf', 'doc', 'docx', 'application/msword', 'application/vnd.openxmlformats'].some(ext => type.includes(ext))) {
+      return 'document-outline';
+    }
+    
+    // Check for spreadsheet files
+    if (['xls', 'xlsx', 'csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml'].some(ext => type.includes(ext))) {
+      return 'grid-outline';
+    }
+    
+    // Check for presentation files
+    if (['ppt', 'pptx', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml'].some(ext => type.includes(ext))) {
+      return 'easel-outline';
+    }
+    
+    // Check for audio files
+    if (type.includes('audio/') || ['mp3', 'wav', 'ogg', 'flac'].some(ext => type.includes(ext))) {
+      return 'musical-note-outline';
+    }
+    
+    // Check for video files
+    if (type.includes('video/') || ['mp4', 'avi', 'mov', 'wmv', 'mkv'].some(ext => type.includes(ext))) {
+      return 'videocam-outline';
+    }
+    
+    // Default icon for unknown file types
+    return 'document-outline';
   };
 
   
@@ -110,6 +157,15 @@ function HomeScreen({ }) {
       label.type.toLowerCase().includes(query)
     );
   });
+
+  // Combine filtered files and labels into a single array
+  const combinedItems = [...filteredFiles, ...filteredLabels];
+  
+  // Sort combined items by timestamp (newest first)
+  combinedItems.sort((a, b) => {
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  });
+
 
   const toggleSelection = (id, type) => {
     if (type === 'file') {
@@ -249,10 +305,12 @@ function HomeScreen({ }) {
     if(previewItem.type === 'file') {
     switch (previewItem.contentType) {
       case 'image':
+      case 'image/jpeg':
+      case 'image/png':
         return (
           <View style={styles.previewContent}>
             <Image 
-              source={{ uri: sampleContent.image }} 
+              source={{ uri: previewItem.url || sampleContent.image}} 
               style={styles.imagePreview} 
               resizeMode="contain"
             />
@@ -373,6 +431,9 @@ function HomeScreen({ }) {
         <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>
           {item.name}
         </ThemedText> 
+        <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileUrl}>
+          {item.url}
+        </ThemedText>
       </TouchableOpacity>
       
       {!isGridView && (
@@ -421,10 +482,10 @@ function HomeScreen({ }) {
             <ThemedText style={styles.tagButtonText}> Create Connection</ThemedText>
           </TouchableOpacity>
         )}
-        
-        {/* Files Section */}
-        <View style={styles.header}>
-          <ThemedText style={styles.titleText}>My Files</ThemedText>
+
+       {/* Combined Files and Connections Section */}
+       <View style={styles.header}>
+          <ThemedText style={styles.titleText}>My Storage</ThemedText>
           <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
             <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
           </TouchableOpacity>
@@ -435,29 +496,15 @@ function HomeScreen({ }) {
           <ThemedText style={styles.noResultsText}>No files found</ThemedText>
         )}
 
-        
+         {/* Combined FlatList for files and connections */}
         <FlatList
-          data={filteredFiles}
-          key={isGridView ? 'grid-files' : 'list-files'}
+          data={combinedItems}
+          key={isGridView ? 'grid-items' : 'list-items'}
           numColumns={isGridView ? 2 : 1}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           style={styles.listContainer}
-        />
-        
-        {/* Connections Section */}
-        <View style={[styles.header, styles.labelsHeader]}>
-          <ThemedText style={styles.titleText}>Connections</ThemedText>
-        </View>
-        
-        <FlatList
-          data={filteredLabels}
-          key={isGridView ? 'grid-labels' : 'list-labels'}
-          numColumns={isGridView ? 2 : 1}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={styles.listContainer}
-        />
+        /> 
         
         {/* Render dropdown menus at the root level to ensure they appear on top */}
         {renderDropdownMenus()}
@@ -855,6 +902,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: '#606060',
     fontSize: 16,
+  },
+
+  fileUrl: {
+    color: '#606060',
+    fontSize: 12
   },
 
 });
