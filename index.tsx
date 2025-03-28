@@ -188,7 +188,7 @@ function HomeScreen({navigation }) {
         type: 'connection',
         associatedFiles: selectedFiles.map(id => {  // Store the selected file IDs
           const file = files.find(f => f.id === id);
-          return file ? file.name : id;  // Map to file names, fallback to ID if not found
+          return file ? {name: file.name , url: file.url } : { name: id, url: ''}; // Map to file names, fallback to ID if not found
         })
       };
       setLabels((prevLabels) => [...prevLabels, newConnection]);
@@ -349,7 +349,11 @@ function HomeScreen({navigation }) {
       <View style={styles.previewContent}>
         <Ionicons name="pricetag-outline" size={64} color="#FF6B6B" />
         <ThemedText style={styles.previewText}>
-          {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:\n${previewItem.associatedFiles?.join('\n') || 'None'}`}
+        {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:\n${
+            previewItem.associatedFiles?.length > 0
+              ? previewItem.associatedFiles.map(file => `${file.name}\n${file.url}`).join('\n\n')
+              : 'None'
+          }`}
         </ThemedText>
       </View>
       );
