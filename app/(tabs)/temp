@@ -1,0 +1,73 @@
+interface File {
+  id: number;  // Changed to number
+  name: string;
+  timestamp: string;
+  icon: string;
+  type: 'file' | 'label';
+  contentType: string;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+}
+
+function HomeScreen({ navigation }) {
+  const [files, setFiles] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Authentication token management
+  const [token, setToken] = useState<string | null>(null);
+
+  // Fetch authentication token
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem('userToken');
+        if (storedToken) {
+          setToken(storedToken);
+        } else {
+          // Redirect to login or handle unauthorized state
+          navigation.navigate('Login');
+        }
+      } catch (err) {
+        console.error('Token retrieval error:', err);
+      }
+    };
+    fetchToken();
+  }, []);
+
+  // Fetch files from backend
+  const fetchFiles = async () => {
+    if (!token) return;
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get<ApiResponse<File[]>>(`${API_BASE_URL}/files`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success) {
+        // Map backend files to match existing icon logic
+        const mappedFiles = response.data.data.map(file => ({
+          ...file,
+          icon: getFileIcon(file.name),
+          type: 'file'
+        }));
+
+        setFiles(mappedFiles);
+        setError(null);
+      } else {
+        setError(response.data.error || 'Failed to fetch files');
+      }
+    } catch (err) {
+      console.error('File fetch error:', err);
+      setError('Network error. Please check your connection.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
