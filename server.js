@@ -89,58 +89,6 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     streamifier.createReadStream(fileBuffer).pipe(stream);
 });
 
-// 🧾 Create New Account
-app.post('/create-account', async (req, res) => {
-    const { username, email, password } = req.body;
-
-    if (!username || !email || !password) {
-        return res.status(400).json({ error: 'Username, email, and password are required' });
-    }
-
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const result = await pool.query(
-            'INSERT INTO users (username, email, password_hash, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id, username, email, created_at',
-            [username, email, hashedPassword]
-        );
-
-        res.status(201).json({ message: 'Account created successfully', user: result.rows[0] });
-    } catch (error) {
-        console.error('Error creating account:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// 🔐 Login
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    try {
-        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        const user = result.rows[0];
-
-        if (!user) {
-            return res.status(400).json({ error: 'Invalid email or password' });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) {
-            return res.status(400).json({ error: 'Invalid email or password' });
-        }
-
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        res.json({ token });
-    } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 app.get('/ping', (req, res) => {
     res.send('pong');
   });
