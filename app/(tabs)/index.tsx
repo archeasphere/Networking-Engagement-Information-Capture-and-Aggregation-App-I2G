@@ -2,7 +2,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import TagModal from './TagModal';
@@ -11,42 +10,173 @@ import SidebarContent from './SidebarContent';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
-
-const API_URL = "https://backend-service-ndyt.onrender.com";
+import { useState, useEffect, useRef } from 'react';
 
 const Drawer = createDrawerNavigator();
 
-const initialFiles = [
-  { id: '1', name: 'Project Docs.pdf', timestamp: new Date('2025-02-19T00:00:00Z').toUTCString(), icon: 'document-text-outline', type: 'file', contentType: 'pdf' },
-  { id: '2', name: 'Design Mockups.png', timestamp: new Date('2025-02-18T00:00:00Z').toUTCString(), icon: 'image-outline', type: 'file', contentType: 'image' },
-  { id: '3', name: 'App Code.zip', timestamp: new Date('2025-02-15T00:00:00Z').toUTCString(), icon: 'file-tray-outline', type: 'file', contentType: 'archive' },
-  { id: '4', name: 'Meeting Notes.txt', timestamp: new Date('2025-02-10T00:00:00Z').toUTCString(), icon: 'document-outline', type: 'file', contentType: 'text' },
+const initialLabels = [
+  { id: 'l1', name: 'Important', timestamp: new Date('2025-02-20T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'connection' },
+  { id: 'l2', name: 'Work', timestamp: new Date('2025-02-17T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'connection' },
 ];
 
 // Sample file content for preview
 const sampleContent = {
-  text: "Meeting Notes\n\nDate: February 10, 2025\nAttendees: John, Sarah, Mike, Lisa\n\nAgenda:\n1. Project status update\n2. Budget review\n3. Timeline adjustment\n\nAction Items:\n- John to complete frontend by Feb 15\n- Sarah to finalize designs by Feb 12\n- Mike to update documentation\n- Lisa to coordinate with clients",
-  pdf: "Document preview not available. This would display the PDF content in a real implementation.",
-  image: "https://via.placeholder.com/800x600",
-  archive: "Archive contents: \n- index.html\n- styles.css\n- script.js\n- images/\n  - logo.png\n  - header.jpg\n- README.md"
+   archive: "Archive contents: \n- index.html\n- styles.css\n- script.js\n- images/\n  - logo.png\n  - header.jpg\n- README.md",
+   connection: "This is a connection preview.\n\nDetails:\n- Groups related files or content.\n- Created to organize your workspace.\n- Lists the files URL."
 };
 
-function HomeScreen({ navigation }) {
+function HomeScreen({ }) {
   const [isGridView, setIsGridView] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [files, setFiles] = useState(initialFiles);
+  const [files, setFiles] = useState([]);
+  const [labels, setLabels] = useState(initialLabels);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newTagName, setNewTagName] = useState('');
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
-  const [previewFile, setPreviewFile] = useState(null);
+  const [previewItem, setPreviewItem] = useState(null);
   const [showDropdownFor, setShowDropdownFor] = useState(null); // ID of the file for which dropdown is visible
+  
+  // New state for sorting
+  const [sortField, setSortField] = useState('timestamp'); // Default sort by timestamp
+  const [sortDirection, setSortDirection] = useState('desc'); // Default sort direction descending (newest first)
 
-  // Filter all items (files and labels combined) based on search query
-  const filteredItems = files.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredFiles = files.filter((file) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      file.name.toLowerCase().includes(query) ||
+      file.timestamp.toLowerCase().includes(query) ||
+      file.type.toLowerCase().includes(query)
+    );
+  });
+  
+  const filteredLabels = labels.filter((label) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      label.name.toLowerCase().includes(query) ||
+      label.timestamp.toLowerCase().includes(query) ||
+      label.type.toLowerCase().includes(query)
+    );
+  });
+
+  // Combine filtered files and labels into a single array
+  const combinedItems = [...filteredFiles, ...filteredLabels];
+  
+  // Sort combined items based on sortField and sortDirection
+  const sortedItems = [...combinedItems].sort((a, b) => {
+    if (sortField === 'name') {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return sortDirection === 'asc' 
+        ? nameA.localeCompare(nameB) 
+        : nameB.localeCompare(nameA);
+    } else if (sortField === 'timestamp') {
+      const dateA = new Date(a.timestamp);
+      const dateB = new Date(b.timestamp);
+      return sortDirection === 'asc' 
+        ? dateA - dateB 
+        : dateB - dateA;
+    }
+    return 0;
+  });
+
+  // Function to handle sorting - toggle direction if same field, or set new field with desc direction
+  const handleSort = (field) => {
+    if (sortField === field) {
+      // Toggle direction if same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field with default direction
+      setSortField(field);
+      setSortDirection('desc'); // Default to descending (newest first or Z-A)
+    }
+  };
+
+  // Helper function to determine icon based on content type
+  const getIconForType = (contentType) => {
+    // First normalize the content type to lowercase
+    const type = contentType ? contentType.toLowerCase() : 'unknown';
+    
+    // Check for PDF files
+    if (type === 'pdf' || type.includes('application/pdf')) {
+      return 'document-text-outline';
+    }
+    
+    // Check for image files
+    if (type === 'image' || 
+        type.includes('image/') ||
+        ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].some(ext => type.includes(ext))) {
+      return 'image-outline';
+    }
+    
+    // Check for archive files
+    if (type === 'archive' || 
+        ['zip', 'rar', '7z', 'tar', 'gz', 'application/zip', 'application/x-rar'].some(ext => type.includes(ext))) {
+      return 'file-tray-outline';
+    }
+    
+    // Check for text files
+    if (type === 'text' || 
+        type.includes('text/') || 
+        ['txt', 'rtf', 'doc', 'docx', 'application/msword', 'application/vnd.openxmlformats'].some(ext => type.includes(ext))) {
+      return 'document-outline';
+    }
+    
+    // Check for spreadsheet files
+    if (['xls', 'xlsx', 'csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml'].some(ext => type.includes(ext))) {
+      return 'grid-outline';
+    }
+    
+    // Check for presentation files
+    if (['ppt', 'pptx', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml'].some(ext => type.includes(ext))) {
+      return 'easel-outline';
+    }
+    
+    // Check for audio files
+    if (type.includes('audio/') || ['mp3', 'wav', 'ogg', 'flac'].some(ext => type.includes(ext))) {
+      return 'musical-note-outline';
+    }
+    
+    // Check for video files
+    if (type.includes('video/') || ['mp4', 'avi', 'mov', 'wmv', 'mkv'].some(ext => type.includes(ext))) {
+      return 'videocam-outline';
+    }
+    
+    // Default icon for unknown file types
+    return 'document-outline';
+  };
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        console.log("📡 Fetching from backend...");
+        const response = await fetch('https://backend-service-ndyt.onrender.com/api/files/all');
+        const json = await response.json();
+   
+        if (!json.success || !json.data) {
+          throw new Error("Invalid response format");
+        }
+   
+        const formattedFiles = json.data.map((file) => ({
+          id: file.id || Math.random().toString(36).substr(2, 9),
+          name: file.file_name,
+          timestamp: new Date(file.uploaded_at || Date.now()).toUTCString(),
+          icon: getIconForType(file.file_type),
+          type: 'file',
+          contentType: file.file_type
+        }));
+   
+        setFiles(formattedFiles);
+      } catch (error) {
+        console.error('Error fetching files:', error);
+        setFiles([]);
+        Alert.alert('Error', 'Failed to load files from server');
+      }
+    };
+   
+    fetchFiles();
+  }, []);
 
   const toggleSelection = (id, type) => {
     if (type === 'file') {
@@ -56,16 +186,23 @@ function HomeScreen({ navigation }) {
     }
   };
 
-  const confirmCreateTag = () => {
-    if (selectedFiles.length > 0 && newTagName.trim()) {
-      const newTag = {
+  const confirmCreateConnection = () => {
+    if (selectedFiles.length > 0) {
+      // Generate a default name if none provided (e.g., "Connection 1", "Connection 2")
+      const connectionCount = labels.length + 1; // Number of existing connections + 1
+      const connectionName = newTagName.trim() || `Connection ${connectionCount}`; // Use input or default
+      const newConnection = {
         id: 'l' + Date.now().toString(),
-        name: newTagName,
+        name: connectionName, // Use the determined name
         timestamp: new Date().toUTCString(),
         icon: 'pricetag-outline',
-        type: 'label'
+        type: 'connection',
+        associatedFiles: selectedFiles.map(id => {  // Store the selected file IDs
+          const file = files.find(f => f.id === id);
+          return file ? file.name : id;  // Map to file names, fallback to ID if not found
+        })
       };
-      setFiles((prevFiles) => [...prevFiles, newTag]);
+      setLabels((prevLabels) => [...prevLabels, newConnection]);
       setSelectedFiles([]);
       setModalVisible(false);
       setNewTagName('');
@@ -76,32 +213,13 @@ function HomeScreen({ navigation }) {
   const handleFileUpload = (fileName = "Uploaded File.pdf") => {
     // Determine the file icon and content type based on extension
     const extension = fileName.split('.').pop().toLowerCase();
-    let icon = 'document-outline';
-    let contentType = 'text';
-    
-    // Set icon and content type based on file extension
-    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(extension)) {
-      icon = 'image-outline';
-      contentType = 'image';
-    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
-      icon = 'file-tray-outline';
-      contentType = 'archive';
-    } else if (['pdf'].includes(extension)) {
-      icon = 'document-text-outline';
-      contentType = 'pdf';
-    } else if (['xls', 'xlsx', 'csv'].includes(extension)) {
-      icon = 'grid-outline';
-      contentType = 'spreadsheet';
-    } else if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
-      icon = 'document-outline';
-      contentType = 'text';
-    }
+    let contentType = extension;
     
     const newFile = {
       id: Date.now().toString(),
       name: fileName,
       timestamp: new Date().toUTCString(),
-      icon: icon,
+      icon: getIconForType(extension), // Use our enhanced getIconForType function
       type: 'file',
       contentType: contentType
     };
@@ -160,8 +278,8 @@ function HomeScreen({ navigation }) {
   };
 
   // Handler for previewing a file
-  const handleFilePreview = (file) => {
-    setPreviewFile(file);
+  const handlePreview = (item) => {
+    setPreviewItem(item);
     setPreviewModalVisible(true);
   };
 
@@ -174,10 +292,13 @@ function HomeScreen({ navigation }) {
 
   // Render the file preview content based on file type
   const renderPreviewContent = () => {
-    if (!previewFile) return null;
+    if (!previewItem) return null;
     
-    switch (previewFile.contentType) {
-      case 'image':
+    if(previewItem.type === 'file') {
+      // Determine content type for preview
+      const contentType = previewItem.contentType.toLowerCase();
+      
+      if (contentType.includes('image') || ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].some(ext => contentType.includes(ext))) {
         return (
           <View style={styles.previewContent}>
             <Image 
@@ -187,33 +308,43 @@ function HomeScreen({ navigation }) {
             />
           </View>
         );
-      case 'pdf':
+      } else if (contentType.includes('pdf')) {
         return (
           <View style={styles.previewContent}>
             <Ionicons name="document-text" size={64} color="#E74C3C" />
             <ThemedText style={styles.previewText}>{sampleContent.pdf}</ThemedText>
           </View>
         );
-      case 'text':
+      } else if (contentType.includes('text') || ['txt', 'rtf', 'doc', 'docx'].some(ext => contentType.includes(ext))) {
         return (
           <View style={styles.previewContent}>
             <ThemedText style={styles.previewText}>{sampleContent.text}</ThemedText>
           </View>
         );
-      case 'archive':
+      } else if (['zip', 'rar', '7z', 'tar', 'gz'].some(ext => contentType.includes(ext))) {
         return (
           <View style={styles.previewContent}>
             <Ionicons name="file-tray" size={64} color="#F39C12" />
             <ThemedText style={styles.previewText}>{sampleContent.archive}</ThemedText>
           </View>
         );
-      default:
+      } else {
         return (
           <View style={styles.previewContent}>
             <Ionicons name="document" size={64} color="#3498DB" />
             <ThemedText style={styles.previewText}>Preview not available for this file type</ThemedText>
           </View>
         );
+      }
+    } else if (previewItem.type === 'connection') {
+      return (
+        <View style={styles.previewContent}>
+          <Ionicons name="pricetag-outline" size={64} color="#FF6B6B" />
+          <ThemedText style={styles.previewText}>
+            {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:\n${previewItem.associatedFiles?.join('\n') || 'None'}`}
+          </ThemedText>
+        </View>
+      );
     }
   };
 
@@ -221,11 +352,11 @@ function HomeScreen({ navigation }) {
   const renderDropdownMenus = () => {
     if (!showDropdownFor) return null;
     
-    const file = files.find(item => item.id === showDropdownFor);
+    const file = [...files, ...labels].find(item => item.id === showDropdownFor);
     if (!file || file.type !== 'file') return null;
     
     // Find the position of the file item in the list
-    const fileIndex = filteredItems.findIndex(item => item.id === showDropdownFor);
+    const fileIndex = combinedItems.findIndex(item => item.id === showDropdownFor);
     if (fileIndex === -1) return null;
     
     // Calculate the position of the dropdown
@@ -267,9 +398,49 @@ function HomeScreen({ navigation }) {
     );
   };
 
+  // Render the sorting header component
+  const renderSortingHeader = () => {
+    if (isGridView) return null; // Don't show sorting header in grid view
+    
+    return (
+      <View style={styles.sortingHeader}>
+        <View style={styles.sortingColumnHeader}>
+          <TouchableOpacity 
+            style={styles.sortingButton} 
+            onPress={() => handleSort('name')}
+          >
+            <ThemedText style={styles.sortingHeaderText}>Name</ThemedText>
+            {sortField === 'name' && (
+              <Ionicons 
+                name={sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'} 
+                size={16} 
+                color="#3A6FF7" 
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.timestampColumnHeader}>
+          <TouchableOpacity 
+            style={styles.sortingButton} 
+            onPress={() => handleSort('timestamp')}
+          >
+            <ThemedText style={styles.sortingHeaderText}>Time</ThemedText>
+            {sortField === 'timestamp' && (
+              <Ionicons 
+                name={sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'} 
+                size={16} 
+                color="#3A6FF7" 
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
   const renderItem = ({ item }) => (
     <View style={[isGridView ? styles.gridItem : styles.rowItem]}>
-      {/* Checkbox area */}
       <View style={styles.checkboxContainer}>
         <Checkbox
           value={selectedFiles.includes(item.id)}
@@ -279,35 +450,26 @@ function HomeScreen({ navigation }) {
         />
       </View>
       
-      {/* File icon */}
       <Ionicons 
         name={item.icon} 
         size={28} 
-        color={item.type === 'label' ? '#FF6B6B' : '#4C8CFF'} 
+        color={item.type === 'connection' ? '#FF6B6B' : '#4C8CFF'} 
         style={styles.fileIcon} 
       />
       
-      {/* File name and timestamp - clickable area */}
       <TouchableOpacity 
         style={styles.fileInfoContainer}
-        onPress={() => {
-          if (item.type === 'file') {
-            handleFilePreview(item);
-          }
-        }}
-        disabled={item.type !== 'file'}
+        onPress={() => handlePreview(item)}
       >
         <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>
           {item.name}
-        </ThemedText>
+        </ThemedText> 
       </TouchableOpacity>
       
-      {/* Timestamp - only for list view */}
       {!isGridView && (
         <ThemedText style={styles.timestamp}>{item.timestamp}</ThemedText>
       )}
       
-      {/* Options menu */}
       <View style={styles.menuContainer}>
         <TouchableOpacity 
           style={styles.menuIconContainer}
@@ -317,7 +479,6 @@ function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
       
-      {/* Grid-specific layout adjustments */}
       {isGridView && (
         <View style={styles.gridBottomSection}>
           <View style={styles.thumbnail} />
@@ -325,7 +486,7 @@ function HomeScreen({ navigation }) {
         </View>
       )}
     </View>
-  );
+  )
 
   return (
     <TouchableOpacity 
@@ -337,7 +498,7 @@ function HomeScreen({ navigation }) {
         <View style={styles.searchBar}>
           <Ionicons name="search-outline" size={20} color="#B0B0B0" />
           <TextInput
-            placeholder="Search files and labels..."
+            placeholder="Search files and connections..."
             placeholderTextColor="#B0B0B0"
             style={styles.searchInput}
             value={searchQuery}
@@ -348,20 +509,29 @@ function HomeScreen({ navigation }) {
         {selectedFiles.length > 0 && (
           <TouchableOpacity style={styles.tagButton} onPress={() => setModalVisible(true)}>
             <Ionicons name="pricetag-outline" size={20} color="#FFFFFF" />
-            <ThemedText style={styles.tagButtonText}> Create Label</ThemedText>
+            <ThemedText style={styles.tagButtonText}> Create Connection</ThemedText>
           </TouchableOpacity>
         )}
         
-        {/* Combined Files and Labels Section */}
+        {/* Combined Files and Connections Section */}
         <View style={styles.header}>
-          <ThemedText style={styles.titleText}>My Files & Labels</ThemedText>
+          <ThemedText style={styles.titleText}>My Storage</ThemedText>
           <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
             <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
           </TouchableOpacity>
         </View>
         
+        {/* New Sorting Header */}
+        {renderSortingHeader()}
+
+        {/* No items found message */}
+        {searchQuery.trim() && sortedItems.length === 0 && (
+          <ThemedText style={styles.noResultsText}>No items found</ThemedText>
+        )}
+        
+        {/* Combined FlatList for files and connections */}
         <FlatList
-          data={filteredItems}
+          data={sortedItems}
           key={isGridView ? 'grid-items' : 'list-items'}
           numColumns={isGridView ? 2 : 1}
           renderItem={renderItem}
@@ -386,7 +556,7 @@ function HomeScreen({ navigation }) {
           TagName={newTagName}
           onChangeTagName={setNewTagName}
           onCancel={() => setModalVisible(false)}
-          onConfirm={confirmCreateTag}
+          onConfirm={confirmCreateConnection}
         />
         
         {/* Upload Files Modal */}
@@ -431,17 +601,14 @@ function HomeScreen({ navigation }) {
         >
           <BlurView intensity={60} style={styles.blurContainer}>
             <View style={styles.previewModalView}>
-              {/* File preview header */}
               <View style={styles.previewHeader}>
                 <ThemedText style={styles.previewTitle}>
-                  {previewFile?.name || "File Preview"}
+                  {previewItem?.name || "Preview"} 
                 </ThemedText>
                 <TouchableOpacity onPress={() => setPreviewModalVisible(false)}>
                   <Ionicons name="close" size={24} color="#000000" />
                 </TouchableOpacity>
               </View>
-              
-              {/* File preview content */}
               {renderPreviewContent()}
             </View>
           </BlurView>
@@ -521,6 +688,36 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '500',
   },
+  
+  // New sorting header styles
+  sortingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginBottom: 4,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+  },
+  sortingColumnHeader: {
+    flex: 1,
+    marginLeft: 70, // Align with file name
+  },
+  timestampColumnHeader: {
+    width: 100,
+    marginRight: 30, // Align with timestamp
+  },
+  sortingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sortingHeaderText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666666',
+    marginRight: 4,
+  },
+  
   rowItem: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -558,7 +755,8 @@ const styles = StyleSheet.create({
   timestamp: { 
     color: '#606060', 
     fontSize: 12,
-    marginRight: 10 
+    marginRight: 10,
+    width: 100, // Fixed width for timestamp column
   },
   menuContainer: {
     position: 'relative',
@@ -762,4 +960,12 @@ const styles = StyleSheet.create({
     color: '#333333',
     lineHeight: 20,
   },
+
+  noResultsText: {
+    textAlign: 'center',
+    marginVertical: 10,
+    color: '#606060',
+    fontSize: 16,
+  },
+
 });

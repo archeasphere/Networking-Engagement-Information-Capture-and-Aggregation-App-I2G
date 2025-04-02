@@ -1,0 +1,137 @@
+  return (
+    <TouchableOpacity 
+      activeOpacity={1} 
+      style={{flex: 1}} 
+      onPress={handleOutsideClick}
+    >
+      <ThemedView style={styles.container}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={20} color="#B0B0B0" />
+          <TextInput
+            placeholder="Search files and connections..."
+            placeholderTextColor="#B0B0B0"
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        
+        {selectedFiles.length > 0 && (
+          <TouchableOpacity style={styles.tagButton} onPress={() => setModalVisible(true)}>
+            <Ionicons name="pricetag-outline" size={20} color="#FFFFFF" />
+            <ThemedText style={styles.tagButtonText}> Create Connection</ThemedText>
+          </TouchableOpacity>
+        )}
+        
+        {/* Combined Files and Connections Section */}
+        <View style={styles.header}>
+          <ThemedText style={styles.titleText}>My Storage</ThemedText>
+          <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
+            <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
+          </TouchableOpacity>
+        </View>
+
+        {/* No items found message */}
+        {searchQuery.trim() && combinedItems.length === 0 && (
+          <ThemedText style={styles.noResultsText}>No items found</ThemedText>
+        )}
+        
+        {/* Combined FlatList for files and connections */}
+        <FlatList
+          data={combinedItems}
+          key={isGridView ? 'grid-items' : 'list-items'}
+          numColumns={isGridView ? 2 : 1}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          style={styles.listContainer}
+        />
+        
+        {/* Render dropdown menus at the root level to ensure they appear on top */}
+        {renderDropdownMenus()}
+        
+        {/* Upload Button (FAB) */}
+        <TouchableOpacity
+          style={styles.uploadButton}
+          onPress={() => setUploadModalVisible(true)}
+        >
+          <Ionicons name="cloud-upload-outline" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+        
+        {/* Tag Modal */}
+        <TagModal
+          visible={modalVisible}
+          TagName={newTagName}
+          onChangeTagName={setNewTagName}
+          onCancel={() => setModalVisible(false)}
+          onConfirm={confirmCreateConnection}
+        />
+        
+        {/* Upload Files Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={uploadModalVisible}
+          onRequestClose={() => setUploadModalVisible(false)}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <ThemedText style={styles.modalTitle}>Upload File</ThemedText>
+              
+              {/* Drag and drop area */}
+              <View style={styles.uploadDropArea}>
+                <Ionicons name="cloud-upload-outline" size={48} color="#B0B0B0" />
+                <ThemedText style={styles.dropText}>Drop your file here</ThemedText>
+                <TouchableOpacity 
+                  style={styles.clickToUpload}
+                  onPress={() => handleFileUpload("MyFile.pdf")}
+                >
+                  <ThemedText style={styles.clickToUploadText}>or click here to upload</ThemedText>
+                </TouchableOpacity>
+              </View>
+              
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setUploadModalVisible(false)}
+              >
+                <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        
+        {/* File Preview Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={previewModalVisible}
+          onRequestClose={() => setPreviewModalVisible(false)}
+        >
+          <BlurView intensity={60} style={styles.blurContainer}>
+            <View style={styles.previewModalView}>
+              <View style={styles.previewHeader}>
+                <ThemedText style={styles.previewTitle}>
+                  {previewItem?.name || "Preview"} 
+                </ThemedText>
+                <TouchableOpacity onPress={() => setPreviewModalVisible(false)}>
+                  <Ionicons name="close" size={24} color="#000000" />
+                </TouchableOpacity>
+              </View>
+              {renderPreviewContent()}
+            </View>
+          </BlurView>
+        </Modal>
+        
+        {/* Selection indicator */}
+        {selectedFiles.length > 0 && (
+          <View style={styles.selectionIndicator}>
+            <ThemedText style={styles.selectionText}>
+              {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'} selected
+            </ThemedText>
+            <TouchableOpacity onPress={() => setSelectedFiles([])}>
+              <ThemedText style={styles.clearSelectionText}>Clear</ThemedText>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ThemedView>
+    </TouchableOpacity>
+  );
