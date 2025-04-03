@@ -1,7 +1,8 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image, Alert, Linking } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, View, TextInput, Modal, Image, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useState, useEffect, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import TagModal from './TagModal';
@@ -10,15 +11,21 @@ import SidebarContent from './SidebarContent';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
-import { useState, useEffect, useRef } from 'react';
+import * as DocumentPicker from 'expo-document-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { uploadToCloudinary } from './FileUpload/cloudinary';
+import { sendFileMetadata } from './FileUpload/files';
 
 const Drawer = createDrawerNavigator();
 
+const API_URL = 'https://backend-service-ndyt.onrender.com';
+
 const initialFiles = [
-  { id: '1', name: 'Project Docs.pdf', timestamp: new Date('2025-02-19T00:00:00Z').toUTCString(), icon: 'document-text-outline', type: 'file', contentType: 'pdf' },
-  { id: '2', name: 'Design Mockups.png', timestamp: new Date('2025-02-18T00:00:00Z').toUTCString(), icon: 'image-outline', type: 'file', contentType: 'image' },
-  { id: '3', name: 'App Code.zip', timestamp: new Date('2025-02-15T00:00:00Z').toUTCString(), icon: 'file-tray-outline', type: 'file', contentType: 'archive' },
-  { id: '4', name: 'Meeting Notes.txt', timestamp: new Date('2025-02-10T00:00:00Z').toUTCString(), icon: 'document-outline', type: 'file', contentType: 'text' },
+  { id: '1', name: 'Project Docs.pdf', timestamp: new Date('2025-02-19T00:00:00Z').toUTCString(), icon: 'document-text-outline', type: 'file', contentType: 'pdf', url: '', size: '0' },
+  { id: '2', name: 'Design Mockups.png', timestamp: new Date('2025-02-18T00:00:00Z').toUTCString(), icon: 'image-outline', type: 'file', contentType: 'image', url: '', size: '0' },
+  { id: '3', name: 'App Code.zip', timestamp: new Date('2025-02-15T00:00:00Z').toUTCString(), icon: 'file-tray-outline', type: 'file', contentType: 'archive', url: '', size: '0' },
+  { id: '4', name: 'Meeting Notes.txt', timestamp: new Date('2025-02-10T00:00:00Z').toUTCString(), icon: 'document-outline', type: 'file', contentType: 'text', url: '', size: '0' },
 ];
 
 const initialLabels = [
@@ -35,11 +42,10 @@ const sampleContent = {
   connection: "This is a connection preview.\n\nDetails:\n- Groups related files or content.\n- Created to organize your workspace.\n- Lists the files URL."
 };
 
-function HomeScreen({navigation }) {
+function HomeScreen({ navigation }) {
   const [isGridView, setIsGridView] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  // const [files, setFiles] = useState(initialFiles);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState(initialFiles);
   const [labels, setLabels] = useState(initialLabels);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -47,7 +53,7 @@ function HomeScreen({navigation }) {
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [previewItem, setPreviewItem] = useState(null);
-  const [showDropdownFor, setShowDropdownFor] = useState(null); // ID of the file for which dropdown is visible
+  const [showDropdownFor, setShowDropdownFor] = useState(null);
 
   const filteredFiles = files.filter((file) => {
     const query = searchQuery.toLowerCase();
@@ -57,6 +63,23 @@ function HomeScreen({navigation }) {
       file.type.toLowerCase().includes(query) ||
       (file.url && file.url.toLowerCase().includes(query))
     );
+  });
+
+  const filteredLabels = labels.filter((label) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      label.name.toLowerCase().includes(query) ||
+      label.timestamp.toLowerCase().includes(query) ||
+      label.type.toLowerCase().includes(query)
+    );
+  });
+
+  // Combine filtered files and labels into a single array
+  const combinedItems = [...filteredFiles, ...filteredLabels];
+  
+  // Sort combined items by timestamp (newest first)
+  combinedItems.sort((a, b) => {
+    return new Date(b.timestamp) - new Date(a.timestamp);
   });
 
   useEffect(() => {
@@ -84,7 +107,7 @@ function HomeScreen({navigation }) {
         setFiles(formattedFiles);
       } catch (error) {
         console.error('Error fetching files:', error);
-        setFiles([]);
+        setFiles(initialFiles);
         Alert.alert('Error', 'Failed to load files from server');
       }
     };
@@ -92,80 +115,48 @@ function HomeScreen({navigation }) {
     fetchFiles();
   }, []);
 
-
-
-  // Helper function to determine icon based on content type
   const getIconForType = (contentType) => {
-    // First normalize the content type to lowercase
     const type = contentType ? contentType.toLowerCase() : 'unknown';
     
-    // Check for PDF files
     if (type === 'pdf' || type.includes('application/pdf')) {
       return 'document-text-outline';
     }
     
-    // Check for image files
     if (type === 'image' || 
         type.includes('image/') ||
         ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].some(ext => type.includes(ext))) {
       return 'image-outline';
     }
     
-    // Check for archive files
     if (type === 'archive' || 
         ['zip', 'rar', '7z', 'tar', 'gz', 'application/zip', 'application/x-rar'].some(ext => type.includes(ext))) {
       return 'file-tray-outline';
     }
     
-    // Check for text files
     if (type === 'text' || 
         type.includes('text/') || 
         ['txt', 'rtf', 'doc', 'docx', 'application/msword', 'application/vnd.openxmlformats'].some(ext => type.includes(ext))) {
       return 'document-outline';
     }
     
-    // Check for spreadsheet files
     if (['xls', 'xlsx', 'csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml'].some(ext => type.includes(ext))) {
       return 'grid-outline';
     }
     
-    // Check for presentation files
     if (['ppt', 'pptx', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml'].some(ext => type.includes(ext))) {
       return 'easel-outline';
     }
     
-    // Check for audio files
     if (type.includes('audio/') || ['mp3', 'wav', 'ogg', 'flac'].some(ext => type.includes(ext))) {
       return 'musical-note-outline';
     }
     
-    // Check for video files
     if (type.includes('video/') || ['mp4', 'avi', 'mov', 'wmv', 'mkv'].some(ext => type.includes(ext))) {
       return 'videocam-outline';
     }
     
-    // Default icon for unknown file types
     return 'document-outline';
   };
-
-  
-  const filteredLabels = labels.filter((label) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      label.name.toLowerCase().includes(query) ||
-      label.timestamp.toLowerCase().includes(query) ||
-      label.type.toLowerCase().includes(query)
-    );
-  });
-
-  // Combine filtered files and labels into a single array
-  const combinedItems = [...filteredFiles, ...filteredLabels];
-  
-  // Sort combined items by timestamp (newest first)
-  combinedItems.sort((a, b) => {
-    return new Date(b.timestamp) - new Date(a.timestamp);
-  });
-
 
   const toggleSelection = (id, type) => {
     if (type === 'file') {
@@ -198,53 +189,52 @@ function HomeScreen({navigation }) {
     }
   };
 
-  // Handler for adding a new file
-  const handleFileUpload = (fileName = "Uploaded File.pdf") => {
-    // Determine the file icon and content type based on extension
-    const extension = fileName.split('.').pop().toLowerCase();
-    let icon = 'document-outline';
-    let contentType = 'text';
-    
-    // Set icon and content type based on file extension
-    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(extension)) {
-      icon = 'image-outline';
-      contentType = 'image';
-    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
-      icon = 'file-tray-outline';
-      contentType = 'archive';
-    } else if (['pdf'].includes(extension)) {
-      icon = 'document-text-outline';
-      contentType = 'pdf';
-    } else if (['xls', 'xlsx', 'csv'].includes(extension)) {
-      icon = 'grid-outline';
-      contentType = 'spreadsheet';
-    } else if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
-      icon = 'document-outline';
-      contentType = 'text';
+
+  const handleFileUpload = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: true,
+        multiple: false
+      });
+  
+      if (result.canceled) return;
+  
+      const file = result.assets[0];
+      console.log("File object:", file);
+      
+      const cloudinaryUrl = await uploadToCloudinary(file);
+      const token = await AsyncStorage.getItem('token');
+      const metadataResponse = await sendFileMetadata(file, cloudinaryUrl, token);
+  
+      if (metadataResponse.success) {
+        const newFile = {
+          id: metadataResponse.data.id,
+          name: file.name,
+          url: cloudinaryUrl,
+          timestamp: new Date().toUTCString(),
+          icon: getIconForType(file.type),
+          contentType: file.type,
+          type: 'file',
+          size: file.size ? file.size.toString() : '0'
+        };
+  
+        setFiles((prev) => [...prev, newFile]);
+        setUploadModalVisible(false);
+      } else {
+        throw new Error('Failed to save file metadata to the backend');
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      Alert.alert('Error', 'Failed to upload file. Please try again.');
     }
-    
-    const newFile = {
-      id: Date.now().toString(),
-      name: fileName,
-      timestamp: new Date().toUTCString(),
-      icon: icon,
-      type: 'file',
-      contentType: contentType
-    };
-    
-    setFiles([...files, newFile]);
-    setUploadModalVisible(false);
   };
 
-  // Handler for opening the file options menu
   const handleOptionsMenu = (file) => {
-    // Toggle dropdown visibility for this file
     setShowDropdownFor(showDropdownFor === file.id ? null : file.id);
   };
 
-  // Handle file deletion
   const handleDeleteFile = (fileId) => {
-    // Show confirmation alert before deletion
     Alert.alert(
       "Delete File",
       "Are you sure you want to delete this file?",
@@ -257,7 +247,7 @@ function HomeScreen({navigation }) {
           text: "Delete", 
           onPress: () => {
             setFiles(files.filter(file => file.id !== fileId));
-            setShowDropdownFor(null); // Hide dropdown after deletion
+            setShowDropdownFor(null);
           },
           style: "destructive"
         }
@@ -265,120 +255,113 @@ function HomeScreen({navigation }) {
     );
   };
 
-  // Handle file sharing
   const handleShareFile = (file) => {
     Alert.alert(
       "Share File",
       `Sharing options for ${file.name} will appear here.`,
       [{ text: "OK" }]
     );
-    setShowDropdownFor(null); // Hide dropdown after action
+    setShowDropdownFor(null);
   };
 
-  // Handle file permissions
   const handleFilePermissions = (file) => {
     Alert.alert(
       "File Permissions",
       `Permission settings for ${file.name} will appear here.`,
       [{ text: "OK" }]
     );
-    setShowDropdownFor(null); // Hide dropdown after action
+    setShowDropdownFor(null);
   };
 
-  // Handler for previewing a file
   const handlePreview = (item) => {
     setPreviewItem(item);
     setPreviewModalVisible(true);
   };
 
-  // Close dropdown when clicking elsewhere
   const handleOutsideClick = () => {
     if (showDropdownFor) {
       setShowDropdownFor(null);
     }
   };
 
-  // Render the file preview content based on file type
   const renderPreviewContent = () => {
     if (!previewItem) return null;
     
-    if(previewItem.type === 'file') {
-    switch (previewItem.contentType) {
-      case 'image':
-      case 'image/jpeg':
-      case 'image/png':
-        return (
-          <View style={styles.previewContent}>
-            <Image 
-              source={{ uri: previewItem.url || sampleContent.image}} 
-              style={styles.imagePreview} 
-              resizeMode="contain"
-            />
-          </View>
+    if (previewItem.type === 'file') {
+      switch (previewItem.contentType) {
+        case 'image':
+        case 'image/jpeg':
+        case 'image/png':
+          return (
+            <View style={styles.previewContent}>
+              <Image 
+                source={{ uri: previewItem.url || sampleContent.image }} 
+                style={styles.imagePreview} 
+                resizeMode="contain"
+              />
+            </View>
+          );
+        case 'pdf':
+        case 'application/pdf':
+          return (
+            <View style={styles.previewContent}>
+              <Ionicons name="document-text" size={64} color="#E74C3C" />
+              <ThemedText style={styles.previewText}>{sampleContent.pdf}</ThemedText>
+            </View>
+          );
+        case 'text':
+          return (
+            <View style={styles.previewContent}>
+              <ThemedText style={styles.previewText}>{sampleContent.text}</ThemedText>
+            </View>
+          );
+        case 'archive':
+          return (
+            <View style={styles.previewContent}>
+              <Ionicons name="file-tray" size={64} color="#F39C12" />
+              <ThemedText style={styles.previewText}>{sampleContent.archive}</ThemedText>
+            </View>
+          );
+        default:
+          return (
+            <View style={styles.previewContent}>
+              <Ionicons name="document" size={64} color="#3498DB" />
+              <ThemedText style={styles.previewText}>Preview not available for this file type</ThemedText>
+            </View>
+          );
+      }
+    } else if (previewItem.type === 'connection') {
+      return (
+        <View style={styles.previewContent}>
+          <Ionicons name="pricetag-outline" size={64} color="#FF6B6B" />
+          <ThemedText style={styles.previewText}>
+          {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:\n${
+              previewItem.associatedFiles?.length > 0
+                ? previewItem.associatedFiles.map(file => `${file.name}\n${file.url}`).join('\n\n')
+                : 'None'
+            }`}
+          </ThemedText>
+        </View>
         );
-      case 'pdf':
-        return (
-          <View style={styles.previewContent}>
-            <Ionicons name="document-text" size={64} color="#E74C3C" />
-            <ThemedText style={styles.previewText}>{sampleContent.pdf}</ThemedText>
-          </View>
-        );
-      case 'text':
-        return (
-          <View style={styles.previewContent}>
-            <ThemedText style={styles.previewText}>{sampleContent.text}</ThemedText>
-          </View>
-        );
-      case 'archive':
-        return (
-          <View style={styles.previewContent}>
-            <Ionicons name="file-tray" size={64} color="#F39C12" />
-            <ThemedText style={styles.previewText}>{sampleContent.archive}</ThemedText>
-          </View>
-        );
-      default:
-        return (
-          <View style={styles.previewContent}>
-            <Ionicons name="document" size={64} color="#3498DB" />
-            <ThemedText style={styles.previewText}>Preview not available for this file type</ThemedText>
-          </View>
-        );
-    }
-  } else if (previewItem.type === 'connection') {
-    return (
-      <View style={styles.previewContent}>
-        <Ionicons name="pricetag-outline" size={64} color="#FF6B6B" />
-        <ThemedText style={styles.previewText}>
-        {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:\n${
-            previewItem.associatedFiles?.length > 0
-              ? previewItem.associatedFiles.map(file => `${file.name}\n${file.url}`).join('\n\n')
-              : 'None'
-          }`}
-        </ThemedText>
-      </View>
-      );
-    }
-  };
+      }
+    };
 
-  // Render each dropdown menu separately at the root level
   const renderDropdownMenus = () => {
     if (!showDropdownFor) return null;
     
     const file = [...files, ...labels].find(item => item.id === showDropdownFor);
     if (!file || file.type !== 'file') return null;
     
-    // Find the position of the file item in the list
     const fileIndex = filteredFiles.findIndex(item => item.id === showDropdownFor);
     if (fileIndex === -1) return null;
     
-    // Calculate the position of the dropdown
-    const itemHeight = isGridView ? 140 : 60; // Approximate height of items
+    const itemHeight = isGridView ? 140 : 60;
     const dropdownTopPosition = 60 + (fileIndex * itemHeight);
     
     return (
       <View style={[styles.dropdownMenu, {
         position: 'absolute',
-        top: Math.min(dropdownTopPosition, 300), // Limit how far down it can go
+        top: Math.min(dropdownTopPosition, 300),
         right: 28,
         zIndex: 9999,
         elevation: 9999,
@@ -434,10 +417,12 @@ function HomeScreen({navigation }) {
       >
         <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>
           {item.name}
-        </ThemedText> 
-        <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileUrl}>
-          {item.url}
         </ThemedText>
+        {item.url && (
+          <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.fileUrl}>
+            {item.url}
+          </ThemedText>
+        )}
       </TouchableOpacity>
       
       {!isGridView && (
@@ -460,12 +445,12 @@ function HomeScreen({navigation }) {
         </View>
       )}
     </View>
-  )
+  );
 
   return (
     <TouchableOpacity 
       activeOpacity={1} 
-      style={{flex: 1}} 
+      style={{ flex: 1 }} 
       onPress={handleOutsideClick}
     >
       <ThemedView style={styles.container}>
@@ -486,21 +471,18 @@ function HomeScreen({navigation }) {
             <ThemedText style={styles.tagButtonText}> Create Connection</ThemedText>
           </TouchableOpacity>
         )}
-
-       {/* Combined Files and Connections Section */}
-       <View style={styles.header}>
+        
+        <View style={styles.header}>
           <ThemedText style={styles.titleText}>My Storage</ThemedText>
           <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
             <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
           </TouchableOpacity>
         </View>
 
-        {/* Add "No files found" message here */}
-        {searchQuery.trim() && filteredFiles.length === 0 && (
+        {searchQuery.trim() && combinedItems.length === 0 && (
           <ThemedText style={styles.noResultsText}>No files found</ThemedText>
         )}
 
-         {/* Combined FlatList for files and connections */}
         <FlatList
           data={combinedItems}
           key={isGridView ? 'grid-items' : 'list-items'}
@@ -510,10 +492,8 @@ function HomeScreen({navigation }) {
           style={styles.listContainer}
         /> 
         
-        {/* Render dropdown menus at the root level to ensure they appear on top */}
         {renderDropdownMenus()}
         
-        {/* Upload Button (FAB) */}
         <TouchableOpacity
           style={styles.uploadButton}
           onPress={() => setUploadModalVisible(true)}
@@ -521,7 +501,6 @@ function HomeScreen({navigation }) {
           <Ionicons name="cloud-upload-outline" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         
-        {/* Tag Modal */}
         <TagModal
           visible={modalVisible}
           TagName={newTagName}
@@ -530,7 +509,6 @@ function HomeScreen({navigation }) {
           onConfirm={confirmCreateConnection}
         />
         
-        {/* Upload Files Modal */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -541,13 +519,12 @@ function HomeScreen({navigation }) {
             <View style={styles.modalView}>
               <ThemedText style={styles.modalTitle}>Upload File</ThemedText>
               
-              {/* Drag and drop area */}
               <View style={styles.uploadDropArea}>
                 <Ionicons name="cloud-upload-outline" size={48} color="#B0B0B0" />
                 <ThemedText style={styles.dropText}>Drop your file here</ThemedText>
                 <TouchableOpacity 
                   style={styles.clickToUpload}
-                  onPress={() => handleFileUpload("MyFile.pdf")}
+                  onPress={handleFileUpload}
                 >
                   <ThemedText style={styles.clickToUploadText}>or click here to upload</ThemedText>
                 </TouchableOpacity>
@@ -563,7 +540,6 @@ function HomeScreen({navigation }) {
           </View>
         </Modal>
         
-        {/* File Preview Modal */}
         <Modal
           animationType="fade"
           transparent={true}
@@ -585,7 +561,6 @@ function HomeScreen({navigation }) {
           </BlurView>
         </Modal>
         
-        {/* Selection indicator */}
         {selectedFiles.length > 0 && (
           <View style={styles.selectionIndicator}>
             <ThemedText style={styles.selectionText}>
@@ -707,7 +682,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   
-  // Dropdown menu styles - improved for better z-index handling
   dropdownMenu: {
     backgroundColor: 'white',
     borderRadius: 8,
@@ -717,7 +691,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3,
-    elevation: 9999, // Highest elevation for Android
+    elevation: 9999,
     width: 150,
   },
   dropdownItem: {
@@ -749,7 +723,6 @@ const styles = StyleSheet.create({
   sidebar: { flex: 1, backgroundColor: '#F8F8F8', padding: 20 },
   listContainer: { marginBottom: 8 },
   
-  // Selection indicator
   selectionIndicator: {
     position: 'absolute',
     bottom: 80,
@@ -771,7 +744,6 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   
-  // Upload button (FAB) styles
   uploadButton: {
     position: 'absolute',
     right: 20,
@@ -789,7 +761,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   
-  // Modal styles
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -824,7 +795,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   
-  // Drag and drop area styles
   uploadDropArea: {
     width: '100%',
     height: 200,
@@ -850,12 +820,11 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   
-  // File preview modal styles
   blurContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.2)', // Additional tint for the blur effect
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
   previewModalView: {
     width: '90%',
@@ -912,5 +881,4 @@ const styles = StyleSheet.create({
     color: '#606060',
     fontSize: 12
   },
-
 });
