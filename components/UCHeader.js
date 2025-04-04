@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -8,12 +8,12 @@ export default function UCHeader() {
 
   return (
     <View style={styles.header}>
-      {/* Hamburger Icon */}
+      {/* Hamburger Menu Icon */}
       <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
         <Ionicons name="menu" size={28} color="#FFFFFF" />
       </TouchableOpacity>
 
-      {/* UC Logo + Title */}
+      {/* UC Merced Logo and Title */}
       <View style={styles.titleContainer}>
         <Image
           source={require('../assets/images/ucm-logo-text.png')}
@@ -26,28 +26,21 @@ export default function UCHeader() {
   );
 }
 
-function HomeScreen({ }) {
-  const [searchQuery, setSearchQuery] = useState('');
-
-
-}
-
 const styles = StyleSheet.create({
-    header: {
-        position: '', // Optional: makes it stick to top
-        top: 1,
-        left: 0,
-        right: 0,
-        zIndex: 10,
-        backgroundColor: '#00274C',
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 19,
-        paddingHorizontal: 30,
-        borderRadius: 0, // Remove rounded corners if you want full edge-to-edge
-        width: '100%',   // ✅ Force full width
-      },
-      
+  header: {
+    position: 'absolute',  // Stick to the top of the screen
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,           // High z-index to stay above other content
+    backgroundColor: '#00274C',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    width: '100%',
+    height: 60,
+  },
   menuButton: {
     marginRight: 16,
   },
@@ -64,19 +57,5 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginVertical: 10,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    color: '#000000',
   },
 });

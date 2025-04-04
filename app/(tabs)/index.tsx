@@ -529,17 +529,19 @@ function HomeScreen({ }) {
       style={{flex: 1}} 
       onPress={handleOutsideClick}
     >
-      <ThemedView style={styles.container}>
+  
       
-      <UCHeader />
+      <ThemedView style={styles.container}>
+        <UCHeader />
+        <View style={styles.headerSpacer} /> {/* This pushes your content below the fixed UCHeader */}
 
-      {/* Title Header */}
-      <View style={styles.header}>
-        <ThemedText style={styles.titleText}>All Files</ThemedText>
-        <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
-          <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
-        </TouchableOpacity>
-      </View>
+        {/* Now your search bar and "All Files" will show properly */}
+        <View style={styles.header}>
+          <ThemedText style={styles.titleText}>All Files</ThemedText>
+          <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
+            <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
+          </TouchableOpacity>
+        </View>
 
       {/* 🔻 Move Search Bar Here */}
       <View style={styles.searchBar}>
@@ -1028,5 +1030,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 11,
   },
+  
+  headerSpacer: {
+    height: 60, // Match the height of UCHeader from UCHeader.js
+  },
+  
 
 });
