@@ -11,11 +11,11 @@ function SidebarContent(props) {
   const activeRouteName = props.state.routes[props.state.index].name;
 
   const routes = [
-    { name: 'index', title: 'Home', icon: 'house.fill' },
-    { name: 'explore', title: 'Explore', icon: 'paperplane.fill' },
+    { name: '/', title: 'All Files', icon: 'folder-outline' },
+    //{ name: 'explore', title: 'Explore', icon: 'paperplane.fill' },
     { name: 'graphView', title: 'File-Label Graph', icon: 'network' },
     { name: 'login', title: 'Login', icon: 'person.circle' },
-    { name: 'files', title: 'Files', icon: 'folder.fill' },
+    //{ name: 'trash', title: 'Trash', icon: 'folder.fill' },
     { name: 'createAccount', title: 'Create Account', icon: 'person.badge.plus' },
   ];
 
@@ -23,7 +23,7 @@ function SidebarContent(props) {
     <View style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}>
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: Colors[colorScheme ?? 'light'].text }]}>
-          Your App Name
+          I2G-Connection App
         </Text>
       </View>
       

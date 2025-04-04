@@ -13,6 +13,7 @@ export default function DrawerLayout() {
     <Drawer
       drawerContent={(props) => <SidebarContent {...props} />}
       screenOptions={{
+        headerShown: false, // ✅ <--- THIS is the missing piece
         headerStyle: { 
           backgroundColor: Colors[colorScheme ?? 'light'].background 
         },

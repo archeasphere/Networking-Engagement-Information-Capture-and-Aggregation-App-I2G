@@ -7,6 +7,7 @@ import Checkbox from 'expo-checkbox';
 import TagModal from './TagModal';
 import LoginScreen from './login';
 import SidebarContent from './SidebarContent';
+import UCHeader from '@/components/UCHeader'; // Adjust path based on file structure
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
@@ -14,6 +15,7 @@ import { useState, useEffect, useRef } from 'react';
 import * as DocumentPicker from 'expo-document-picker';
 import { uploadFile } from '../../utils/api';
 const Drawer = createDrawerNavigator();
+
 
 const initialLabels = [
   { id: 'l1', name: 'Important', timestamp: new Date('2025-02-20T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'connection' },
@@ -528,16 +530,28 @@ function HomeScreen({ }) {
       onPress={handleOutsideClick}
     >
       <ThemedView style={styles.container}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={20} color="#B0B0B0" />
-          <TextInput
-            placeholder="Search files and connections..."
-            placeholderTextColor="#B0B0B0"
-            style={styles.searchInput}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
+      
+      <UCHeader />
+
+      {/* Title Header */}
+      <View style={styles.header}>
+        <ThemedText style={styles.titleText}>All Files</ThemedText>
+        <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
+          <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
+        </TouchableOpacity>
+      </View>
+
+      {/* 🔻 Move Search Bar Here */}
+      <View style={styles.searchBar}>
+        <Ionicons name="search-outline" size={20} color="#B0B0B0" />
+        <TextInput
+          placeholder="Search files and connections..."
+          placeholderTextColor="#B0B0B0"
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
         
         {selectedFiles.length > 0 && (
           <TouchableOpacity style={styles.tagButton} onPress={() => setModalVisible(true)}>
@@ -547,12 +561,13 @@ function HomeScreen({ }) {
         )}
         
         {/* Combined Files and Connections Section */}
-        <View style={styles.header}>
-          <ThemedText style={styles.titleText}>My Storage</ThemedText>
+
+        {/* <View style={styles.header}>
+          <ThemedText style={styles.titleText}>All Files</ThemedText>
           <TouchableOpacity onPress={() => setIsGridView(!isGridView)}>
             <Ionicons name={isGridView ? 'grid-outline' : 'list-outline'} size={24} color="#000000" />
           </TouchableOpacity>
-        </View>
+        </View> */}
         
         {/* New Sorting Header */}
         {renderSortingHeader()}
@@ -581,6 +596,7 @@ function HomeScreen({ }) {
           onPress={() => setUploadModalVisible(true)}
         >
           <Ionicons name="cloud-upload-outline" size={24} color="#FFFFFF" />
+          <ThemedText style={styles.uploadText}>New</ThemedText>
         </TouchableOpacity>
         
         {/* Tag Modal */}
@@ -663,18 +679,17 @@ function HomeScreen({ }) {
   );
 }
 
+// 
 export default function AppNavigator() {
   return (
-    <Drawer.Navigator 
-      drawerContent={(props) => <SidebarContent {...props} />} 
+    <Drawer.Navigator
+      drawerContent={(props) => <SidebarContent {...props} />}
       screenOptions={{
+        headerShown: false, // Disable the default header
         drawerStyle: { backgroundColor: '#FFFFFF' },
         drawerLabelStyle: { color: '#000000' },
-        headerStyle: { backgroundColor: '#FFFFFF' },
-        headerTitleStyle: { color: '#000000' },
-        headerTintColor: '#000000',
       }}
-    > 
+    >
       <Drawer.Screen name="Home" component={HomeScreen} />
     </Drawer.Navigator>
   );
@@ -703,11 +718,12 @@ const styles = StyleSheet.create({
     borderTopColor: '#E0E0E0',
     paddingTop: 16
   },
-  titleText: { 
-    color: '#333333',
-    fontSize: 24, 
-    fontWeight: 'bold' 
-  },  
+  titleText: {
+    fontSize: 22,
+    fontWeight: '600', // or 'bold' for a heavier look
+    color: '#1A1A1A',   // or use '#000000' for true black
+    letterSpacing: 0.5, // subtle spacing
+  }, 
   tagButton: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -1000,10 +1016,17 @@ const styles = StyleSheet.create({
     color: '#606060',
     fontSize: 16,
   },
-  
+
   fileUrl: {
     color: '#606060',
     fontSize: 12
+  },
+
+  uploadText: {
+    color: '#FFFFFF',
+    marginLeft: 1,
+    fontWeight: '500',
+    fontSize: 11,
   },
 
 });
