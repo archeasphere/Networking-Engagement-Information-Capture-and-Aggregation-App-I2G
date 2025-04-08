@@ -38,7 +38,14 @@ const monthMappings = {
   'sep': 'september',
   'oct': 'october',
   'nov': 'november',
-  'dec': 'december'
+  'dec': 'december',
+  'sun': 'sunday',
+  'mon': 'monday',
+  'tue':'tuesday',
+  'wed': 'wednesday',
+  'thu':'thursday',
+  'fri':'friday', 
+  'sat':'saturday',
 };
 
 function HomeScreen({ }) {
@@ -601,7 +608,7 @@ function HomeScreen({ }) {
           transparent={true}
           visible={uploadModalVisible}
           onRequestClose={() => setUploadModalVisible(false)}
-        >
+        > 
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <ThemedText style={styles.modalTitle}>Upload File</ThemedText>
