@@ -192,26 +192,65 @@ function HomeScreen({ }) {
     }
   };
 
-  const confirmCreateConnection = () => {
+  const confirmCreateConnection = async () => {
     if (selectedFiles.length > 0) {
-      // Generate a default name if none provided (e.g., "Connection 1", "Connection 2")
-      const connectionCount = labels.length + 1; // Number of existing connections + 1
-      const connectionName = newTagName.trim() || `Connection ${connectionCount}`; // Use input or default
-      const newConnection = {
-        id: 'l' + Date.now().toString(),
-        name: connectionName, // Use the determined name
-        timestamp: new Date().toUTCString(),
-        icon: 'pricetag-outline',
-        type: 'connection',
-        associatedFiles: selectedFiles.map(id => {  // Store the selected file IDs
-          const file = files.find(f => f.id === id);
-          return file ? file.name : id;  // Map to file names, fallback to ID if not found
-        })
-      };
-      setLabels((prevLabels) => [...prevLabels, newConnection]);
-      setSelectedFiles([]);
-      setModalVisible(false);
-      setNewTagName('');
+      const connectionCount = labels.length + 1;
+      const connectionName = newTagName.trim() || `Connection ${connectionCount}`;
+  
+      const associatedFiles = selectedFiles.map((id) => {
+        const file = files.find((f) => f.id === id);
+        return file ? { name: file.name, url: file.url } : { name: id, url: '' };
+      });
+  
+      const fileContent = associatedFiles
+        .map((file) => `Name: ${file.name}\nURL: ${file.url}\n`)
+        .join('\n');
+  
+      console.log("📁 Connection file content:", fileContent);
+  
+      try {
+        // Create a Blob for the .txt file
+        const blob = new Blob([fileContent], { type: 'text/plain' });
+  
+        // Convert Blob to Base64
+        const base64Content = await blobToBase64(blob);
+  
+        // Upload the file using the same logic as `uploadFile`
+        const data = await uploadFile({
+          uri: `data:text/plain;base64,${base64Content}`, // Base64-encoded string
+          name: `${connectionName}.txt`,
+          mimeType: 'text/plain',
+        });
+  
+        const fileUrl = data.file_url || data.url;
+        if (!fileUrl) {
+          throw new Error('No file URL returned from the upload');
+        }
+  
+        console.log('✅ Connection file uploaded to Cloudinary:', fileUrl);
+  
+        const newConnection = {
+          id: 'l' + Date.now().toString(),
+          name: connectionName,
+          timestamp: new Date().toUTCString(),
+          icon: 'pricetag-outline',
+          type: 'connection',
+          associatedFiles: associatedFiles.map((file) => file.name),
+          connectionFileUrl: fileUrl,
+        };
+  
+        console.log("✅ New connection created:", newConnection);
+  
+        setLabels((prevLabels) => [...prevLabels, newConnection]);
+        setSelectedFiles([]);
+        setModalVisible(false);
+        setNewTagName('');
+      } catch (error) {
+        console.error('❌ Failed to upload connection file:', error);
+        Alert.alert('Error', 'Failed to save connection file.');
+      }
+    } else {
+      console.warn("🚫 No files selected for the connection.");
     }
   };
 
@@ -255,6 +294,15 @@ function HomeScreen({ }) {
     } else {
       console.warn("🚫 File picking was cancelled or invalid:", result);
     }
+  };
+
+  const blobToBase64 = (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract Base64 string
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   };
   
 
@@ -371,8 +419,15 @@ function HomeScreen({ }) {
         <View style={styles.previewContent}>
           <Ionicons name="pricetag-outline" size={64} color="#FF6B6B" />
           <ThemedText style={styles.previewText}>
-            {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:\n${previewItem.associatedFiles?.join('\n') || 'None'}`}
+            {`Connection: ${previewItem.name}\nCreated: ${previewItem.timestamp}\n\nAssociated Files:`}
           </ThemedText>
+          {previewItem.associatedFiles?.map((file, index) => (
+            <View key={index} style={{ marginTop: 8 }}>
+              <ThemedText style={styles.previewText}>
+                {`Name: ${file.name}\nURL: ${file.url}`}
+              </ThemedText>
+            </View>
+          ))}
         </View>
       );
     }
