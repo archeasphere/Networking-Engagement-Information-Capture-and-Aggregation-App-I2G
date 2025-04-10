@@ -16,7 +16,7 @@ export default function CreateAccountScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCreateAccount = async () => {
+  /* const handleCreateAccount = async () => {
     // Basic validation
     if (!email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -31,15 +31,100 @@ export default function CreateAccountScreen() {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(`${API_URL}/users/register`, {
+      const response = await axios.post(`${API_URL}/api/users/register`, {
         email,
         password,
+        username: 'TEST'
       });
 
       if (response.status === 201) {
+        Alert.alert(
+          '🎉 Account Created',
+          'Your account has been successfully created. You can now log in.',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      } else {
+        Alert.alert('Oops', 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating account:', error);
+    
+      const axiosError = error as AxiosError<ErrorResponse>;
+      const errorMessage = axiosError.response?.data?.message || 'Failed to create account';
+    
+      Alert.alert('❌ Error', errorMessage);
+    }
+  } */
+
+    /*
+    const handleCreateAccount = async () => {
+        if (!email || !password || !confirmPassword) {
+          Alert.alert('Error', 'Please fill in all fields');
+          return;
+        }
+      
+        if (password !== confirmPassword) {
+          Alert.alert('Error', 'Passwords do not match');
+          return;
+        }
+      
+        setIsLoading(true); // Start loading spinner
+      
+        try {
+          const response = await axios.post(`${API_URL}/api/users/register`, {
+            email,
+            password,
+            username: 'TEST'
+          });
+      
+          if (response.status === 201) {
+            Alert.alert(
+              '🎉 Account Created',
+              'Your account has been successfully created. You can now log in.',
+              [{ text: 'OK', onPress: () => navigation.goBack() }]
+            );
+          } else {
+            Alert.alert('Oops', 'Something went wrong. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error creating account:', error);
+      
+          const axiosError = error as AxiosError<ErrorResponse>;
+          const errorMessage = axiosError.response?.data?.message || 'Failed to create account';
+      
+          Alert.alert('❌ Error', errorMessage);
+        } finally {
+          setIsLoading(false); // ✅ Always reset loading, no matter what
+        }
+      };  
+      */    
+
+      const handleCreateAccount = async () => {
+        // Basic validation
+        if (!email || !password || !confirmPassword) {
+          Alert.alert('Error', 'Please fill in all fields');
+          return;
+        }
+    
+        if (password !== confirmPassword) {
+          Alert.alert('Error', 'Passwords do not match');
+          return;
+        }
+    
+        setIsLoading(true);
+        
+        try {
+          const response = await axios.post(`${API_URL}/api/users/register`, {
+            email,
+            password,
+            username: 'TEST'
+          });
+
+       if (response.status === 201) {
         Alert.alert('Success', 'Account created successfully');
         navigation.goBack();
       }
+      
     } catch (error) {
       console.error('Error creating account:', error);
       
@@ -51,7 +136,7 @@ export default function CreateAccountScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }; 
 
   return (
     <View style={styles.container}>

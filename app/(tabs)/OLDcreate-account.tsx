@@ -17,46 +17,41 @@ export default function CreateAccountScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateAccount = async () => {
+    // Basic validation
     if (!email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
-  
+
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
-  
-    setIsLoading(true); // Start loading spinner
-  
+
+    setIsLoading(true);
+    
     try {
       const response = await axios.post(`${API_URL}/api/users/register`, {
         email,
         password,
-        username: 'TEST5'
       });
-  
+
       if (response.status === 201) {
-        Alert.alert(
-          '🎉 Account Created',
-          'Your account has been successfully created. You can now log in.',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
-        );
-      } else {
-        Alert.alert('Oops', 'Something went wrong. Please try again.');
+        Alert.alert('Success', 'Account created successfully');
+        navigation.goBack();
       }
     } catch (error) {
       console.error('Error creating account:', error);
-  
+      
+      // Type guard for AxiosError
       const axiosError = error as AxiosError<ErrorResponse>;
       const errorMessage = axiosError.response?.data?.message || 'Failed to create account';
-  
-      Alert.alert('❌ Error', errorMessage);
+      
+      Alert.alert('Error', errorMessage);
     } finally {
-      setIsLoading(false); // ✅ Always reset loading, no matter what
+      setIsLoading(false);
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -100,10 +95,9 @@ export default function CreateAccountScreen() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('login')} style={styles.linkContainer}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.linkContainer}>
         <Text style={styles.link}>Already have an account? Sign In</Text>
       </TouchableOpacity>
-
     </View>
   );
 }
