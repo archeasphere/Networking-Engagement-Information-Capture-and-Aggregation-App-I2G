@@ -1,8 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
 import { useRouter } from 'expo-router'; // ✅ Expo Router navigation
 
 const API_URL = 'https://backend-service-ndyt.onrender.com';
@@ -12,23 +10,12 @@ interface ErrorResponse {
 }
 
 export default function CreateAccountScreen() {
-    const router = useRouter();
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    
-    useFocusEffect(
-      useCallback(() => {
-        // Clear all fields when screen is focused (visited)
-        setUsername('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-      }, [])
-    );
-    
+  const router = useRouter(); // ✅ replaces useNavigation()
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateAccount = async () => {
     if (!username || !email || !password || !confirmPassword) {
@@ -51,14 +38,23 @@ export default function CreateAccountScreen() {
       });
 
       if (response.status === 201) {
-        console.log('✅ Account creation successful');
 
-        Alert.alert('🎉 Account Created', 'Your account has been successfully created. Redirecting...');
-        
-        setTimeout(() => {
-          console.log('➡️ Navigating to /login');
-          router.replace('/login');
-        }, 1500);
+        console.log('✅ Account creation successful'); ////
+          
+
+          Alert.alert(
+          '🎉 Account Created',
+          'Your account has been successfully created. You can now log in.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('➡️ Navigating to /login'); ////
+                router.push('/login'); // ✅ correct routing for Expo Router
+              },
+            },
+          ]
+        );
       } else {
         Alert.alert('Oops', 'Something went wrong. Please try again.');
       }
