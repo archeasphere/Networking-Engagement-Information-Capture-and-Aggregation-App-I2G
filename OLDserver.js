@@ -7,8 +7,6 @@ const streamifier = require("streamifier");
 const pool = require('./db');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const authenticateToken = require('./middleware/auth');
-
 
 const userRoutes = require('./routes/users');
 const fileRoutes = require('./routes/files');
@@ -51,7 +49,7 @@ app.get("/", (req, res) => {
 const upload = multer();
 
 // ☁️ Upload File to Cloudinary + Save Metadata
-/* app.post("/upload", upload.single("file"), async (req, res) => {
+app.post("/upload", upload.single("file"), async (req, res) => {
     const userId = 1; // TODO: Replace with user from JWT in production
 
     if (!req.file) {
@@ -89,49 +87,7 @@ const upload = multer();
     );
 
     streamifier.createReadStream(fileBuffer).pipe(stream);
-}); 
-*/
-
-app.post("/upload", authenticateToken, upload.single("file"), async (req, res) => {
-    const userId = req.user.userId;
-  
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-  
-    const fileBuffer = req.file.buffer;
-    const originalName = req.file.originalname;
-    const fileType = req.file.mimetype;
-    const fileSize = req.file.size;
-  
-    const stream = cloudinary.uploader.upload_stream(
-      { resource_type: "auto", folder: "my_project_files" },
-      async (error, result) => {
-        if (error) return res.status(500).json({ error: error.message });
-  
-        try {
-          await pool.query(
-            `INSERT INTO file_metadata (user_id, file_name, file_type, file_size, file_url, uploaded_at)
-             VALUES ($1, $2, $3, $4, $5, NOW());`,
-            [userId, originalName, fileType, fileSize, result.secure_url]
-          );
-  
-          res.json({
-            name: originalName,
-            type: fileType,
-            size: fileSize,
-            url: result.secure_url,
-          });
-        } catch (dbError) {
-          console.error("DB Save Error:", dbError);
-          res.status(500).json({ error: "Failed to save file metadata" });
-        }
-      }
-    );
-  
-    streamifier.createReadStream(fileBuffer).pipe(stream);
-  });
-  
+});
 
 // 🧾 Create New Account
 app.post('/create-account', async (req, res) => {
@@ -176,18 +132,9 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        // ✅ Create token with user ID
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // ✅ Return token and user info (you can include more fields if needed)
-        res.json({
-            token,
-            user: {
-                id: user.id,
-                email: user.email,
-                username: user.username,
-            }
-        });
+        res.json({ token });
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ error: 'Internal server error' });
