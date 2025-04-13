@@ -13,7 +13,7 @@ import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
 import { useState, useEffect, useRef } from 'react';
 import * as DocumentPicker from 'expo-document-picker';
-import { uploadFile } from '../../utils/api';
+import { uploadFile } from './api';
 import NotesModal from './notesModal';
 
 const Drawer = createDrawerNavigator();
