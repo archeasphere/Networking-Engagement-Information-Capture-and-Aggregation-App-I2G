@@ -1,39 +1,35 @@
 import { View, TextInput, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import NotesModal from './notesModal';
 
-interface TagModalProps {
+interface NotesModalProps {
   visible: boolean;
-  TagName: string;
-  onChangeTagName: (text: string) => void;
+  note: string;
+  onChangeNote: (text: string) => void;
   onCancel: () => void;
-  onAddNote: () => void;
   onConfirm: () => void;
 }
 
-export default function TagModal({ visible, TagName, onChangeTagName, onCancel, onConfirm, onAddNote }: TagModalProps) {
+export default function NotesModal({ visible, note, onChangeNote, onCancel, onConfirm }: NotesModalProps) {
   return (
     <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onCancel}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <TextInput
-            placeholder="Tag Name"
+            placeholder="Enter note..."
             placeholderTextColor="#aaa"
             style={styles.modalInput}
-            value={TagName}
-            onChangeText={onChangeTagName}
+            value={note}
+            onChangeText={onChangeNote}
+            multiline
           />
           <View style={styles.modalButtons}>
             <TouchableOpacity onPress={onCancel} style={styles.modalButton}>
               <ThemedText style={styles.buttonText}>Cancel</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity onPress={onConfirm} style={styles.modalButton}>
-              <ThemedText style={styles.buttonText}>Create</ThemedText>
+              <ThemedText style={styles.buttonText}>Save</ThemedText>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={onAddNote} style={styles.addNoteButton}>
-            <ThemedText style={styles.addNoteText}>+ Add Note</ThemedText>
-          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -43,31 +39,33 @@ export default function TagModal({ visible, TagName, onChangeTagName, onCancel, 
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)', // Lighter overlay for better visibility
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF', // White background
+    backgroundColor: '#FFFFFF',
     padding: 20,
     borderRadius: 10,
     width: '80%',
     alignItems: 'center',
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.2, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 5, // Shadow for Android
+    elevation: 5,
   },
   modalInput: {
-    backgroundColor: '#F0F0F0', // Light gray input background
-    color: '#000000', // Black text color
+    backgroundColor: '#F0F0F0',
+    color: '#000000',
     padding: 10,
     borderRadius: 5,
     width: '100%',
+    minHeight: 80, // to better support multi-line notes
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#D0D0D0', // Subtle border
+    borderColor: '#D0D0D0',
+    textAlignVertical: 'top', // for multiline top alignment
   },
   modalButtons: {
     flexDirection: 'row',
@@ -80,19 +78,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#000000', // Black text for contrast
+    color: '#000000',
     fontWeight: 'bold',
   },
-  addNoteButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#E8E8E8',
-    borderRadius: 5,
-    width: '100%',
-    alignItems: 'center',
-  },
-  addNoteText: {
-    color: '#000',
-    fontWeight: 'bold',
-  },  
 });
