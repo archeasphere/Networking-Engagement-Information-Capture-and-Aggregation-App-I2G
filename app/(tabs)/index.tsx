@@ -18,6 +18,8 @@ import NotesModal from './notesModal';
 
 const Drawer = createDrawerNavigator();
 
+const API_URL = "connectec.cdgae8oqycgc.us-east-2.rds.amazonaws.com";
+
 const initialLabels = [
   { id: 'l1', name: 'Important', timestamp: new Date('2025-02-20T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'connection' },
   { id: 'l2', name: 'Work', timestamp: new Date('2025-02-17T00:00:00Z').toUTCString(), icon: 'pricetag-outline', type: 'connection' },
