@@ -14,6 +14,7 @@ import { BlurView } from 'expo-blur';
 import { useState, useEffect, useRef } from 'react';
 import * as DocumentPicker from 'expo-document-picker';
 import { uploadFile } from '../../utils/api';
+
 const Drawer = createDrawerNavigator();
 
 
@@ -156,6 +157,7 @@ function HomeScreen({ }) {
     try {
       console.log("📡 Fetching from backend...");
       const response = await fetch('https://backend-service-ndyt.onrender.com/api/files/all');
+
       const json = await response.json();
  
       if (!json.success || !json.data) {
